@@ -12,10 +12,10 @@ from src.ingestion.loaders import load_pdf
 from src.ingestion.splitter import split_documents
 
 from src.indexing.embeddings import get_embedding_model
-from src.indexing.vectorstore import (
-    create_vectorstore,
-    save_vectorstore,
-)
+from src.indexing.embedding_engine import EmbeddingEngine
+from src.indexing.faiss_store import FAISSStore
+from src.indexing.indexer import FAISSIndexer
+from src.indexing.checkpoint import CheckpointManager
 
 from src.utils.cache import (
     cache_exists,
@@ -91,27 +91,26 @@ def main():
 
     embedding_model = get_embedding_model()
 
-    print("Creating FAISS index...")
+    embedding_engine = EmbeddingEngine(
+        embedding_model=embedding_model,
+        batch_size=512,
+    )
+
+    vector_store = FAISSStore()
+
+    checkpoint_manager = CheckpointManager(
+        checkpoint_dir=CHECKPOINT_DIR,
+    )
 
     indexer = FAISSIndexer(
-        embedding_model=embedding_model,
-        batch_size=INDEX_BATCH_SIZE,
+        embedding_engine=embedding_engine,
+        vector_store=vector_store,
+        checkpoint_manager=checkpoint_manager,
+        checkpoint_every=20,
     )
 
-    vectorstore = indexer.build(chunks)
-    
-    print(f"Saving vector store to {VECTORSTORE_DIR}")
-
-    save_vectorstore(
-        vectorstore=vectorstore,
-        vectorstore_path=Path(VECTORSTORE_DIR),
-    )
-
-    print()
-    print("=" * 80)
-    print("Finished!")
-    print(f"Indexed {vectorstore.index.ntotal} vectors")
-    print("=" * 80)
+    indexer.build(chunks)
+    indexer.save(VECTORSTORE_DIR)
 
 
 if __name__ == "__main__":
