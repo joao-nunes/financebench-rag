@@ -5,6 +5,7 @@ from src.config import (
     DOCUMENTS_CACHE,
     PDF_DIR,
     VECTORSTORE_DIR,
+    INDEX_BATCH_SIZE
 )
 
 from src.ingestion.loaders import load_pdf
@@ -23,7 +24,9 @@ from src.utils.cache import (
 )
 
 import argparse
+import time
 
+from src.indexing.indexer import FAISSIndexer
 
 def main():
 
@@ -53,7 +56,7 @@ def main():
     else:
         documents = []
         failed_pdfs = []
-
+        start = time.perf_counter()
         for pdf in pdf_files:
             print(f"Loading {pdf.name}")
 
@@ -65,7 +68,8 @@ def main():
                 print(f"   {e}")
                 failed_pdfs.append((pdf.name, str(e)))
 
-        print(f"\nLoaded {len(documents)} pages")
+        elapsed = time.perf_counter() - start
+        print(f"Loaded {len(documents):,} pages in {elapsed:.1f}s")
         print(f"Skipped {len(failed_pdfs)} PDFs")
 
         if failed_pdfs:
@@ -73,27 +77,29 @@ def main():
             for name, err in failed_pdfs:
                 print(f" - {name}: {err}")
 
-    print()
-    print(f"Loaded {len(documents)} pages")
+        save_cache(documents, DOCUMENTS_CACHE)
 
-    if cache_exists(CHUNKS_CACHE):
+    if cache_exists(CHUNKS_CACHE) and not args.rebuild:
         print("Loading cached chunks...")
         chunks = load_cache(CHUNKS_CACHE)
     else:
+        start = time.perf_counter()
         chunks = split_documents(documents)
+        elapsed = time.perf_counter() - start
+        print(f"Generated {len(chunks)} chunks in {elapsed:.1f}s")
         save_cache(chunks, CHUNKS_CACHE)
-
-    print(f"Generated {len(chunks)} chunks")
 
     embedding_model = get_embedding_model()
 
     print("Creating FAISS index...")
 
-    vectorstore = create_vectorstore(
-        documents=chunks,
+    indexer = FAISSIndexer(
         embedding_model=embedding_model,
+        batch_size=INDEX_BATCH_SIZE,
     )
 
+    vectorstore = indexer.build(chunks)
+    
     print(f"Saving vector store to {VECTORSTORE_DIR}")
 
     save_vectorstore(

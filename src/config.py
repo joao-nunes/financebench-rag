@@ -36,3 +36,5 @@ CACHE_DIR = DATA_DIR / "cache"
 
 DOCUMENTS_CACHE = CACHE_DIR / "documents.pkl"
 CHUNKS_CACHE = CACHE_DIR / "chunks.pkl"
+
+INDEX_BATCH_SIZE=512

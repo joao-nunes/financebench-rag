@@ -12,7 +12,6 @@ def create_vectorstore(
     """
     Build a FAISS vector store from a list of documents.
     """
-
     return FAISS.from_documents(
         documents=documents,
         embedding=embedding_model,
