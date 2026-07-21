@@ -36,8 +36,8 @@ class FAISSStore:
 
     def create(
         self,
-        embeddings: Sequence[Sequence[float]],
-        documents: Sequence[Document],
+        embeddings,
+        documents,
     ) -> None:
 
         if self._store is not None:
@@ -45,11 +45,9 @@ class FAISSStore:
 
         dimension = len(embeddings[0])
 
-        index = faiss.IndexFlatL2(dimension)
-
         self._store = FAISS(
             embedding_function=None,
-            index=index,
+            index=faiss.IndexFlatL2(dimension),
             docstore=InMemoryDocstore(),
             index_to_docstore_id={},
         )
@@ -57,42 +55,23 @@ class FAISSStore:
         self.add(embeddings, documents)
 
     def add(
-        self,
-        embeddings: Sequence[Sequence[float]],
-        documents: Sequence[Document],
-    ) -> None:
+    self,
+    embeddings: Sequence[Sequence[float]],
+    documents: Sequence[Document],
+) -> None:
 
         if self._store is None:
             raise RuntimeError("Index has not been initialized.")
 
-        embeddings = np.asarray(
-            embeddings,
-            dtype=np.float32,
+        text_embeddings = [
+            (doc.page_content, emb)
+            for doc, emb in zip(documents, embeddings)
+        ]
+
+        self._store.add_embeddings(
+            text_embeddings=text_embeddings,
+            metadatas=[doc.metadata for doc in documents],
         )
-
-        start_idx = self.size
-
-        #
-        # Add vectors
-        #
-        self._store.index.add(embeddings)
-
-        #
-        # Add documents
-        #
-        for i, document in enumerate(documents):
-
-            doc_id = str(uuid.uuid4())
-
-            self._store.docstore.add(
-                {
-                    doc_id: document
-                }
-            )
-
-            self._store.index_to_docstore_id[
-                start_idx + i
-            ] = doc_id
 
         logger.info(
             "Added %d vectors (total=%d)",
@@ -100,14 +79,15 @@ class FAISSStore:
             self.size,
         )
     def save(
-        self,
-        path: str | Path,
-    ) -> None:
+            self,
+            path: str | Path,
+        ) -> None:
 
-        logger.info("Saving FAISS index...")
+            logger.info("Saving FAISS index...")
 
-        self.store.save_local(str(path))
+            self.store.save_local(str(path))
     
+
     def load(
         self,
         path: str | Path,
@@ -119,5 +99,5 @@ class FAISSStore:
         self._store = FAISS.load_local(
             folder_path=str(path),
             embeddings=embedding_model,
-            allow_dangerous_deserialization=False,
+            allow_dangerous_deserialization=True,
         )

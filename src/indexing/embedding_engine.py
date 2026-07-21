@@ -74,7 +74,7 @@ class EmbeddingEngine:
 
         embedded = 0
 
-        for step, batch in enumerate(self.batches(documents)):
+        for step, batch in enumerate(self.batches(documents), start=1):
 
             vectors = self.embed_batch(batch)
 

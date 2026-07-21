@@ -19,11 +19,23 @@ def main():
 
 
     embedding_model = get_embedding_model()
-    vectorstore = load_vectorstore(Path(VECTORSTORE_DIR), embedding_model)
+    print("✓ Embedding model loaded")
 
-    print(f"Loaded {vectorstore.index.ntotal} vectors.\n")
+    store = load_vectorstore(
+        Path(VECTORSTORE_DIR),
+        embedding_model,
+    )
 
-    retriever = create_retriever(vectorstore)
+    print(f"Loaded {store.size} vectors.")
+
+    retriever = create_retriever(store.store)
+    print(f"✓ Loaded {store.size} vectors")
+
+    print(f"Embedding dimension: {len(embedding_model.embed_query('hello'))}")
+
+    print("Creating retriever...")
+    retriever = create_retriever(store.store)
+    print("✓ Retriever created")
 
     prompt = get_rag_prompt()
 

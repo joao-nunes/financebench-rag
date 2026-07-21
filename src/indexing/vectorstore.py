@@ -3,7 +3,9 @@ from pathlib import Path
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 
+from src.indexing.faiss_store import FAISSStore
 
 def create_vectorstore(
     documents: list[Document],
@@ -33,15 +35,18 @@ def save_vectorstore(
 
 
 def load_vectorstore(
-    load_path: str | Path,
-    embedding_model: HuggingFaceEmbeddings,
-) -> FAISS:
+    path: str | Path,
+    embedding_model: Embeddings,
+) -> FAISSStore:
     """
-    Load a persisted FAISS index.
+    Load a FAISS vector store from disk.
     """
 
-    return FAISS.load_local(
-        folder_path=str(load_path),
-        embeddings=embedding_model,
-        allow_dangerous_deserialization=True,
+    store = FAISSStore()
+
+    store.load(
+        path=path,
+        embedding_model=embedding_model,
     )
+
+    return store

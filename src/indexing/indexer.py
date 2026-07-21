@@ -9,113 +9,66 @@ from langchain_core.documents import Document
 
 from src.indexing.embedding_engine import EmbeddingEngine
 from src.indexing.faiss_store import FAISSStore
-from src.indexing.checkpoint import CheckpointManager
-from src.indexing.metadata import CheckpointMetadata
 from src.utils.logger import get_logger
+
 
 logger = get_logger(__name__)
 
 
 class FAISSIndexer:
     """
-    Orchestrates the complete indexing pipeline.
+    Coordinates the indexing pipeline.
 
-        Documents
-            │
-            ▼
-    EmbeddingEngine
-            │
-            ▼
-    FAISSStore
-            │
-            ▼
-    CheckpointManager
+    Responsibilities
+    ----------------
+    - Iterate over document batches
+    - Generate embeddings
+    - Insert vectors into FAISS
+    - Report progress
+
+    It intentionally knows nothing about the
+    implementation details of embeddings or FAISS.
     """
 
     def __init__(
         self,
         embedding_engine: EmbeddingEngine,
         vector_store: FAISSStore,
-        checkpoint_manager: CheckpointManager | None = None,
-        checkpoint_every: int = 20,
     ) -> None:
 
         self.embedding_engine = embedding_engine
         self.vector_store = vector_store
 
-        self.checkpoint_manager = checkpoint_manager
-        self.checkpoint_every = checkpoint_every
-
     def build(
         self,
         documents: Sequence[Document],
-        resume: bool = False,
     ) -> FAISSStore:
         """
-        Build (or resume) a FAISS index.
+        Build a FAISS index from a collection of documents.
         """
 
         if len(documents) == 0:
             raise ValueError("No documents provided.")
 
-        total_documents = len(documents)
-
-        indexed_documents = 0
-
-        first_batch = True
-
-        #
-        # Resume from checkpoint
-        #
-        if (
-            resume
-            and self.checkpoint_manager is not None
-            and self.checkpoint_manager.exists()
-        ):
-
-            logger.info("Loading checkpoint...")
-
-            metadata = self.checkpoint_manager.load_metadata()
-
-            self.vector_store = self.checkpoint_manager.load_store(
-                self.vector_store,
-                self.embedding_engine.embedding_model,
-            )
-
-            indexed_documents = metadata.indexed_documents
-
-            documents = documents[indexed_documents:]
-
-            first_batch = False
-
-            logger.info(
-                "Resuming from document %d.",
-                indexed_documents,
-            )
-
         logger.info(
-            "Starting indexing (%d documents).",
-            total_documents,
+            "Starting indexing of %d documents.",
+            len(documents),
         )
+
+        total_docs = len(documents)
+
+        indexed_docs = 0
 
         start_time = time.perf_counter()
 
-        #
-        # Main indexing loop
-        #
-        for batch_idx, (batch, embeddings) in enumerate(
-            self.embedding_engine.embed(documents),
-            start=1,
-        ):
+        for batch_number, batch, embeddings in self.embedding_engine.embed(documents):
 
-            if first_batch:
+            if batch_number == 1:
 
                 self.vector_store.create(
                     embeddings=embeddings,
                     documents=batch,
                 )
-
-                first_batch = False
 
             else:
 
@@ -124,98 +77,47 @@ class FAISSIndexer:
                     documents=batch,
                 )
 
-            indexed_documents += len(batch)
+            indexed_docs += len(batch)
 
             elapsed = time.perf_counter() - start_time
 
-            throughput = (
-                indexed_documents / elapsed
-                if elapsed > 0
-                else 0
-            )
+            throughput = indexed_docs / elapsed
 
-            remaining = total_documents - indexed_documents
+            remaining = total_docs - indexed_docs
 
-            eta = (
-                remaining / throughput
-                if throughput > 0
-                else 0
-            )
+            eta = remaining / throughput if throughput > 0 else 0
 
             logger.info(
                 (
-                    "Batch %d | "
-                    "%d/%d docs | "
+                    "[Batch %d] "
+                    "Indexed %d/%d documents | "
                     "%.1f docs/s | "
                     "ETA %s | "
-                    "Index size=%d"
+                    "Index size: %d"
                 ),
-                batch_idx,
-                indexed_documents,
-                total_documents,
+                batch_number,
+                indexed_docs,
+                total_docs,
                 throughput,
                 timedelta(seconds=int(eta)),
                 self.vector_store.size,
             )
 
-            #
-            # Save checkpoint
-            #
-            if (
-                self.checkpoint_manager is not None
-                and batch_idx % self.checkpoint_every == 0
-            ):
-
-                metadata = CheckpointMetadata.create(
-                    current_batch=batch_idx,
-                    indexed_documents=indexed_documents,
-                    total_documents=total_documents,
-                    batch_size=self.embedding_engine.batch_size,
-                    embedding_model=type(
-                        self.embedding_engine.embedding_model
-                    ).__name__,
-                )
-
-                self.checkpoint_manager.save(
-                    self.vector_store,
-                    metadata,
-                )
-
         elapsed = time.perf_counter() - start_time
 
         logger.info("=" * 80)
-        logger.info("Indexing complete")
-        logger.info("Documents : %d", indexed_documents)
-        logger.info("Vectors   : %d", self.vector_store.size)
+        logger.info("Indexing completed")
+        logger.info("Documents      : %d", total_docs)
+        logger.info("Vectors        : %d", self.vector_store.size)
         logger.info(
-            "Elapsed   : %s",
+            "Elapsed        : %s",
             timedelta(seconds=int(elapsed)),
         )
         logger.info(
-            "Speed     : %.1f docs/s",
-            indexed_documents / elapsed,
+            "Throughput     : %.1f docs/s",
+            total_docs / elapsed,
         )
         logger.info("=" * 80)
-
-        #
-        # Final checkpoint
-        #
-        if self.checkpoint_manager is not None:
-
-            metadata = CheckpointMetadata.create(
-                current_batch=-1,
-                indexed_documents=indexed_documents,
-                total_documents=total_documents,
-                batch_size=self.embedding_engine.batch_size,
-                embedding_model=type(
-                    self.embedding_engine.embedding_model
-                ).__name__,
-            )
-
-            self.checkpoint_manager.save(
-                self.vector_store,
-                metadata,
-            )
 
         return self.vector_store
 
@@ -224,6 +126,6 @@ class FAISSIndexer:
         output_dir: str | Path,
     ) -> None:
         """
-        Save the final FAISS index.
+        Save the current index.
         """
         self.vector_store.save(output_dir)

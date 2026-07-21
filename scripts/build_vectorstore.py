@@ -5,7 +5,7 @@ from src.config import (
     DOCUMENTS_CACHE,
     PDF_DIR,
     VECTORSTORE_DIR,
-    INDEX_BATCH_SIZE
+    CHECKPOINT_DIR
 )
 
 from src.ingestion.loaders import load_pdf
@@ -26,7 +26,6 @@ from src.utils.cache import (
 import argparse
 import time
 
-from src.indexing.indexer import FAISSIndexer
 
 def main():
 
@@ -105,8 +104,6 @@ def main():
     indexer = FAISSIndexer(
         embedding_engine=embedding_engine,
         vector_store=vector_store,
-        checkpoint_manager=checkpoint_manager,
-        checkpoint_every=20,
     )
 
     indexer.build(chunks)
