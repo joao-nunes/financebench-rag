@@ -13,13 +13,14 @@ from src.indexing.faiss_store import FAISSStore
 from src.retrieval.retrievers import create_retriever
 from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
+from src.evaluation.benchmark import BenchmarkWriter
+
 
 VECTORSTORE_PATH = Path("./data/vectorstore")
 
 DATASET_PATH = Path(
     "./data/financebench/data/financebench_open_source.jsonl"
 )
-
 
 embedding_model = get_embedding_model()
 
@@ -45,8 +46,11 @@ dataset = FinanceBenchDataset.from_jsonl(DATASET_PATH)
 split = Split.load("data/financebench/splits")
 dataset = dataset.subset(split.train_ids)
 
-results = runner.evaluate(dataset)
+with BenchmarkWriter("results/retrieval.jsonl") as writer:
 
+    for result in runner.run(dataset):
+        writer.write(result)
+results = runner.evaluate(dataset)
 for benchmark_result in results[:5]:
 
     print("=" * 80)

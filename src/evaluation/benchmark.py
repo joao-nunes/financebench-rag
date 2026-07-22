@@ -4,7 +4,14 @@ from .dataset import EvaluationDataset
 from .models import BenchmarkResult
 from .pipeline import RAGPipeline
 from .retrieval import RetrievalEvaluator
+from collections.abc import Iterator
+from tqdm.auto import tqdm
 
+import json
+from pathlib import Path
+
+from src.evaluation.models import BenchmarkResult
+from dataclasses import asdict
 
 class BenchmarkRunner:
     """Runs a benchmark over an evaluation dataset."""
@@ -21,25 +28,66 @@ class BenchmarkRunner:
         self,
         dataset: EvaluationDataset,
     ) -> list[BenchmarkResult]:
-        """Evaluate a RAG pipeline on every sample in a dataset."""
 
-        results: list[BenchmarkResult] = []
+        return list(self.run(dataset))
+    
 
-        for sample in dataset:
+    def run(
+        self,
+        dataset: EvaluationDataset,
+    ) -> Iterator[BenchmarkResult]:
 
-            pipeline_result = self._rag_pipeline.invoke(sample.question)
+        for sample in tqdm(
+            dataset,
+            total=len(dataset),
+            desc="Running benchmark",
+        ):
 
-            retrieval_metrics = self._retrieval_evaluator.evaluate(
-                sample,
-                pipeline_result,
+            pipeline_result = self._rag_pipeline.invoke(
+                sample.question
             )
 
-            results.append(
-                BenchmarkResult(
-                    sample=sample,
-                    result=pipeline_result,
-                    retrieval_metrics=retrieval_metrics,
+            retrieval_metrics = (
+                self._retrieval_evaluator.evaluate(
+                    sample,
+                    pipeline_result,
                 )
             )
 
-        return results
+            yield BenchmarkResult(
+                sample=sample,
+                result=pipeline_result,
+                retrieval_metrics=retrieval_metrics,
+            )
+
+class BenchmarkWriter:
+    """
+    Incrementally writes benchmark results to a JSONL file.
+
+    One BenchmarkResult is written per line, allowing long-running
+    evaluations to be resumed or inspected before completion.
+    """
+
+    def __init__(self, output_path: str | Path):
+        self._path = Path(output_path)
+        self._file = None
+
+    def __enter__(self) -> "BenchmarkWriter":
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        self._file = self._path.open("w", encoding="utf-8")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self._file is not None:
+            self._file.close()
+
+    def write(self, result: BenchmarkResult):
+
+        json.dump(
+            asdict(result),
+            self._file,
+            ensure_ascii=False,
+        )
+
+        self._file.write("\n")
+        self._file.flush()
