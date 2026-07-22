@@ -68,6 +68,28 @@ class FAISSStore:
             for doc, emb in zip(documents, embeddings)
         ]
 
+
+        embeddings = np.asarray(embeddings, dtype=np.float32)
+
+        assert embeddings.ndim == 2
+        assert embeddings.shape[1] == 768
+
+        if not np.isfinite(embeddings).all():
+            raise ValueError("Embeddings contain NaN or Inf")
+
+        if np.isnan(embeddings).any():
+            raise ValueError("Embeddings contain NaN")
+
+        if np.isinf(embeddings).any():
+            raise ValueError("Embeddings contain Inf")
+        
+        logger.info(
+            "Batch stats | min=%f max=%f mean=%f",
+            embeddings.min(),
+            embeddings.max(),
+            embeddings.mean(),
+        )
+
         self._store.add_embeddings(
             text_embeddings=text_embeddings,
             metadatas=[doc.metadata for doc in documents],
@@ -78,15 +100,13 @@ class FAISSStore:
             len(documents),
             self.size,
         )
-    def save(
-            self,
-            path: str | Path,
-        ) -> None:
 
-            logger.info("Saving FAISS index...")
+    def save(self, path: str | Path) -> None:
+        path = Path(path)
+        path.mkdir(parents=True, exist_ok=True)
 
-            self.store.save_local(str(path))
-    
+        self._store.save_local(str(path))
+
 
     def load(
         self,

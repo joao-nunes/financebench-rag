@@ -120,12 +120,3 @@ class FAISSIndexer:
         logger.info("=" * 80)
 
         return self.vector_store
-
-    def save(
-        self,
-        output_dir: str | Path,
-    ) -> None:
-        """
-        Save the current index.
-        """
-        self.vector_store.save(output_dir)

@@ -105,9 +105,9 @@ def main():
         embedding_engine=embedding_engine,
         vector_store=vector_store,
     )
-
     indexer.build(chunks)
-    indexer.save(VECTORSTORE_DIR)
+
+    vector_store.save(VECTORSTORE_DIR)
 
 
 if __name__ == "__main__":
