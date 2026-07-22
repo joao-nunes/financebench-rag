@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+
+from src.evaluation.models import EvaluationResult, EvaluationSample
 
 from .metrics import (
-    hit_rate,
+    unbounded_recall,
     ndcg_at_k,
     precision_at_k,
     recall_at_k,
@@ -12,35 +14,33 @@ from .metrics import (
 
 @dataclass(slots=True)
 class RetrievalMetrics:
-
-    hit_rate: float
-
+    unbounded_recall: float
     recall_at_1: float
-
     recall_at_5: float
-
     recall_at_10: float
-
     precision_at_5: float
-
     mrr: float
-
     ndcg_at_10: float
+
+    def to_dict(self):
+        return asdict(self)
 
 
 class RetrievalEvaluator:
 
     def evaluate(
         self,
-        ground_truth: list[str],
-        retrieved: list[str],
-    ) -> RetrievalMetrics:
+        sample: EvaluationSample,
+        result: EvaluationResult,
+    ):
 
-        relevant = set(ground_truth)
+        relevant = {sample.source_document}
+
+        retrieved = [ doc.document_id for doc in result.retrieved_documents]
 
         return RetrievalMetrics(
 
-            hit_rate=hit_rate(
+            unbounded_recall=unbounded_recall(
                 relevant,
                 retrieved,
             ),

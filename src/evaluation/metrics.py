@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 
-def hit_rate(relevant: set[str], retrieved: list[str]) -> float:
+def unbounded_recall(relevant: set[str], retrieved: list[str]) -> float:
     """
     Returns 1 if at least one relevant document was retrieved.
     """

@@ -16,6 +16,8 @@ from src.indexing.embedding_engine import EmbeddingEngine
 from src.indexing.faiss_store import FAISSStore
 from src.indexing.indexer import FAISSIndexer
 from src.indexing.checkpoint import CheckpointManager
+from src.ingestion.helpers import enrich_chunk
+
 
 from src.utils.cache import (
     cache_exists,
@@ -84,6 +86,9 @@ def main():
     else:
         start = time.perf_counter()
         chunks = split_documents(documents)
+
+        chunks = [enrich_chunk(chunk) for chunk in chunks]
+
         elapsed = time.perf_counter() - start
         print(f"Generated {len(chunks)} chunks in {elapsed:.1f}s")
         save_cache(chunks, CHUNKS_CACHE)

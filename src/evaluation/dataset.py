@@ -32,26 +32,15 @@ class FinanceBenchDataset:
                 record = json.loads(line)
 
                 sample = EvaluationSample(
-
                     question=record["question"],
-
                     reference_answer=record["answer"],
-
-                    reference_documents=[record["doc_name"]],
-
+                    source_document=record["doc_name"],
                     metadata={
-
                         "id": record["financebench_id"],
-
                         "company": record["company"],
-
                         "question_type": record["question_type"],
-
                         "reasoning": record["question_reasoning"],
-
                         "subset": record["dataset_subset_label"],
-
-                        "page": record["evidence"][0]["evidence_page_num"],
                     },
                 )
 

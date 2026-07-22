@@ -1,8 +1,18 @@
+from __future__ import annotations
+
+import time
+
 from langchain_core.documents import Document
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.runnables import Runnable, RunnablePassthrough
+
+from src.evaluation.models import (
+    EvaluationResult,
+    RetrievedDocument,
+)
+from src.evaluation.pipeline import RAGPipeline
 
 
 def format_docs(docs: list[Document]) -> str:
@@ -71,3 +81,77 @@ def create_rag_chain(
     )
 
     return rag_chain
+
+
+class LangChainRAGPipeline(RAGPipeline):
+    """
+    Concrete implementation of a Retrieval-Augmented Generation pipeline.
+
+    Responsibilities
+    ----------------
+    1. Retrieve relevant documents.
+    2. Generate an answer.
+    3. Convert LangChain objects into EvaluationResult.
+    """
+
+    def __init__(
+        self,
+        retriever,
+        prompt: ChatPromptTemplate,
+        llm: BaseChatModel,
+    ) -> None:
+
+        self.retriever = retriever
+
+        self.chain = create_rag_chain(
+            retriever=retriever,
+            prompt=prompt,
+            llm=llm,
+        )
+
+    def invoke(
+        self,
+        question: str,
+    ) -> EvaluationResult:
+
+        start = time.perf_counter()
+
+        #
+        # Retrieval
+        #
+        retrieved_docs = self.retriever.invoke(question)
+
+        #
+        # Generation
+        #
+        prediction = self.chain.invoke(question)
+
+        latency_ms = (time.perf_counter() - start) * 1000
+
+        retrieved_documents = []
+
+        for rank, doc in enumerate(retrieved_docs, start=1):
+
+            retrieved_documents.append(
+
+                RetrievedDocument(
+
+                    document_id=doc.metadata["document_id"],
+
+                    score=doc.metadata.get(
+                        "score",
+                        0.0,
+                    ),
+
+                    rank=rank,
+
+                    metadata=doc.metadata,
+                )
+            )
+
+        return EvaluationResult(
+            question=question,
+            prediction=prediction,
+            retrieved_documents=retrieved_documents,
+            latency_ms=latency_ms,
+        )

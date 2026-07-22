@@ -20,7 +20,7 @@ EMBEDDING_DEVICE = "mps"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 
-TOP_K = 5
+TOP_K = 30
 
 # =========================
 # OpenAI

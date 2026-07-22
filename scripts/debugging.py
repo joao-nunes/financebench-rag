@@ -1,16 +1,9 @@
-from src.evaluation.dataset import FinanceBenchDataset
+from src.ingestion.loaders import load_pdf
+from src.ingestion.splitter import split_documents
 
-dataset = FinanceBenchDataset(
-    "data/financebench/data/financebench_open_source.jsonl"
-)
+pdf_path = "./data/financebench/pdfs/APPLE_2022_10K.pdf"
 
-samples = dataset.load()
+documents = load_pdf(pdf_path)
+chunks = split_documents(documents)
 
-print(f"Loaded {len(samples)} questions")
-
-sample = samples[0]
-
-print(sample.question)
-print(sample.reference_answer)
-print(sample.reference_documents)
-print(sample.metadata)
+print(chunks[0].metadata)

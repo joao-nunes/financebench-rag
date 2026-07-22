@@ -42,11 +42,11 @@ def main():
 
 
     print("Creating RAG chain...")
-    rag_chain = create_rag_chain(
-       retriever=retriever,
-        prompt=prompt,
-        llm=llm,
-    )
+    pipeline = LangChainRAGPipeline(
+    retriever=retriever,
+    prompt=prompt,
+    llm=llm,
+)
 
     print("=" * 60)
     print("FinanceBench RAG")
@@ -63,7 +63,8 @@ def main():
 
         print("\nThinking...\n")
 
-        answer = rag_chain.invoke(question)
+        result = pipeline.invoke(question)
+        answer = result.prediction
 
         docs = retriever.invoke(question)
         

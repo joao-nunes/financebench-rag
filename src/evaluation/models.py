@@ -6,13 +6,9 @@ from typing import Any
 
 @dataclass(slots=True)
 class EvaluationSample:
-
     question: str
-
     reference_answer: str
-
     source_document: str
-
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -59,3 +55,18 @@ class RetrievalMetrics:
     precision_at_5: float
     mrr: float
     ndcg: float
+
+
+@dataclass(slots=True)
+class BenchmarkResult:
+    """
+    Stores the complete result of evaluating one sample.
+    """
+
+    sample: EvaluationSample
+
+    result: EvaluationResult
+
+    retrieval_metrics: RetrievalMetrics
+
+    metadata: dict[str, Any] = field(default_factory=dict)

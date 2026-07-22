@@ -20,4 +20,12 @@ def load_pdf(pdf_path: str | Path) -> list[Document]:
 
     documents = loader.load()
 
+   
+
+    document_id = pdf_path.stem
+
+    for doc in documents:
+        doc.metadata["document_id"] = document_id
+
+
     return documents
