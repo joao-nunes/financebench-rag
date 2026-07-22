@@ -1,52 +1,45 @@
 from __future__ import annotations
 
+from .dataset import EvaluationDataset
+from .models import BenchmarkResult
 from .pipeline import RAGPipeline
-
-from .dataset import FinanceBenchDataset
-from .models import (
-    BenchmarkResult,
-    EvaluationResult,
-)
 from .retrieval import RetrievalEvaluator
 
 
 class BenchmarkRunner:
+    """Runs a benchmark over an evaluation dataset."""
 
     def __init__(
         self,
         rag_pipeline: RAGPipeline,
         retrieval_evaluator: RetrievalEvaluator,
-    ):
-
-        self.rag_pipeline = rag_pipeline
-        self.retrieval_evaluator = retrieval_evaluator
+    ) -> None:
+        self._rag_pipeline = rag_pipeline
+        self._retrieval_evaluator = retrieval_evaluator
 
     def evaluate(
         self,
-        dataset: FinanceBenchDataset,
+        dataset: EvaluationDataset,
     ) -> list[BenchmarkResult]:
+        """Evaluate a RAG pipeline on every sample in a dataset."""
 
-        benchmark_results = []
+        results: list[BenchmarkResult] = []
 
-        for sample in dataset.load():
+        for sample in dataset:
 
-            result = self.rag_pipeline.invoke(
-                sample.question
+            pipeline_result = self._rag_pipeline.invoke(sample.question)
+
+            retrieval_metrics = self._retrieval_evaluator.evaluate(
+                sample,
+                pipeline_result,
             )
 
-            retrieval_metrics = (
-                self.retrieval_evaluator.evaluate(
-                    sample,
-                    result,
-                )
-            )
-
-            benchmark_results.append(
+            results.append(
                 BenchmarkResult(
                     sample=sample,
-                    result=result,
+                    result=pipeline_result,
                     retrieval_metrics=retrieval_metrics,
                 )
             )
 
-        return benchmark_results
+        return results

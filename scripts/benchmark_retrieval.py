@@ -11,7 +11,7 @@ from src.evaluation.retrieval import RetrievalEvaluator
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
 from src.retrieval.retrievers import create_retriever
-
+from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
 
 VECTORSTORE_PATH = Path("./data/vectorstore")
@@ -41,7 +41,9 @@ runner = BenchmarkRunner(
     retrieval_evaluator=RetrievalEvaluator(),
 )
 
-dataset = FinanceBenchDataset(DATASET_PATH)
+dataset = FinanceBenchDataset.from_jsonl(DATASET_PATH)
+split = Split.load("data/financebench/splits")
+dataset = dataset.subset(split.train_ids)
 
 results = runner.evaluate(dataset)
 
