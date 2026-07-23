@@ -39,6 +39,7 @@ class EvaluationResult:
     prediction: str
 
     retrieved_documents: list[RetrievedDocument]
+    reranked_documents: list[RetrievedDocument]
 
     latency_ms: float
 

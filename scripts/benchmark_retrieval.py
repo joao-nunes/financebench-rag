@@ -14,8 +14,16 @@ from src.retrieval.retrievers import create_retriever
 from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
 from src.evaluation.benchmark import BenchmarkWriter
+from src.retrieval.reranking import CrossEncoderReranker
+from src import config
+from src.utils.config_io import save_config
 
+experiment_dir = Path("experiments/baseline")
 
+save_config(
+    config,
+    experiment_dir / "config.json",
+)
 VECTORSTORE_PATH = Path("./data/vectorstore")
 
 DATASET_PATH = Path(
@@ -35,7 +43,9 @@ retriever = create_retriever(
     vectorstore.store,
 )
 
-pipeline = RetrievalPipeline(retriever)
+reranker = CrossEncoderReranker()
+
+pipeline = RetrievalPipeline(retriever, reranker)
 
 runner = BenchmarkRunner(
     rag_pipeline=pipeline,
@@ -46,10 +56,6 @@ dataset = FinanceBenchDataset.from_jsonl(DATASET_PATH)
 split = Split.load("data/financebench/splits")
 dataset = dataset.subset(split.train_ids)
 
-with BenchmarkWriter("results/retrieval.jsonl") as writer:
-
-    for result in runner.run(dataset):
-        writer.write(result)
 results = runner.evaluate(dataset)
 for benchmark_result in results[:5]:
 
@@ -95,7 +101,7 @@ for result in results:
         "expected": result.sample.source_document,
 
         "retrieved_top1":
-            result.result.retrieved_documents[0].document_id,
+            result.result.reranked_documents[0].document_id,
 
         **result.retrieval_metrics.to_dict(),
     })

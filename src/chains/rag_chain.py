@@ -32,6 +32,16 @@ def format_docs(docs: list[Document]) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 
 
+def create_generation_chain(
+    prompt: ChatPromptTemplate,
+    llm: BaseChatModel,
+):
+    return (
+        prompt
+        | llm
+        | StrOutputParser()
+    )
+
 def create_rag_chain(
     retriever,
     prompt: ChatPromptTemplate,
@@ -97,14 +107,15 @@ class LangChainRAGPipeline(RAGPipeline):
     def __init__(
         self,
         retriever,
+        reranker,
         prompt: ChatPromptTemplate,
         llm: BaseChatModel,
     ) -> None:
 
         self.retriever = retriever
+        self.reranker = reranker
 
-        self.chain = create_rag_chain(
-            retriever=retriever,
+        self.chain = create_generation_chain(
             prompt=prompt,
             llm=llm,
         )
@@ -116,35 +127,35 @@ class LangChainRAGPipeline(RAGPipeline):
 
         start = time.perf_counter()
 
-        #
-        # Retrieval
-        #
         retrieved_docs = self.retriever.invoke(question)
 
-        #
-        # Generation
-        #
-        prediction = self.chain.invoke(question)
+        reranked_docs = self.reranker.rerank(
+            question,
+            retrieved_docs,
+        )
+
+        context = format_docs(reranked_docs)
+
+        prediction = self.chain.invoke(
+            {
+                "question": question,
+                "context": context,
+            }
+        )
+
 
         latency_ms = (time.perf_counter() - start) * 1000
 
         retrieved_documents = []
 
-        for rank, doc in enumerate(retrieved_docs, start=1):
+        for rank, doc in enumerate(reranked_docs, start=1):
 
             retrieved_documents.append(
-
                 RetrievedDocument(
-
                     document_id=doc.metadata["document_id"],
-
-                    score=doc.metadata.get(
-                        "score",
-                        0.0,
-                    ),
-
+                    text=doc.page_content,
+                    score=doc.metadata.get("score", 0.0),
                     rank=rank,
-
                     metadata=doc.metadata,
                 )
             )

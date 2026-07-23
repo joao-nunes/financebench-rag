@@ -20,7 +20,7 @@ class RetrievalMetrics:
     recall_at_10: float
     precision_at_5: float
     mrr: float
-    ndcg_at_10: float
+    ndcg_at_5: float
 
     def to_dict(self):
         return asdict(self)
@@ -36,8 +36,8 @@ class RetrievalEvaluator:
 
         relevant = {sample.source_document}
 
-        retrieved = [ doc.document_id for doc in result.retrieved_documents]
-
+        retrieved = [doc.document_id for doc in result.retrieved_documents]
+        reranked = [doc.document_id for doc in result.reranked_documents]
         return RetrievalMetrics(
 
             unbounded_recall=unbounded_recall(
@@ -47,36 +47,36 @@ class RetrievalEvaluator:
 
             recall_at_1=recall_at_k(
                 relevant,
-                retrieved,
+                reranked,
                 1,
             ),
 
             recall_at_5=recall_at_k(
                 relevant,
-                retrieved,
+                reranked,
                 5,
             ),
 
             recall_at_10=recall_at_k(
                 relevant,
-                retrieved,
+                reranked,
                 10,
             ),
 
             precision_at_5=precision_at_k(
                 relevant,
-                retrieved,
+                reranked,
                 5,
             ),
 
             mrr=reciprocal_rank(
                 relevant,
-                retrieved,
+                reranked,
             ),
 
-            ndcg_at_10=ndcg_at_k(
+            ndcg_at_5=ndcg_at_k(
                 relevant,
-                retrieved,
-                10,
+                reranked,
+                5,
             ),
         )

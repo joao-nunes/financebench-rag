@@ -51,7 +51,7 @@ def save_error_analysis(
 
             "mrr": result.retrieval_metrics.mrr,
 
-            "ndcg_at_10": result.retrieval_metrics.ndcg_at_10,
+            "ndcg_at_5": result.retrieval_metrics.ndcg_at_5,
 
             "retrieved_documents": " | ".join(
                 retrieved_ids

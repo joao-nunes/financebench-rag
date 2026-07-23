@@ -47,9 +47,11 @@ class FinanceBenchRAGPipeline:
     def __init__(
         self,
         retriever,
+        reranker,
         generator,
     ):
         self.retriever = retriever
+        self.reranker = reranker
         self.generator = generator
 
     def invoke(
@@ -60,10 +62,14 @@ class FinanceBenchRAGPipeline:
         start = time.perf_counter()
 
         retrieved_documents = self.retriever.retrieve(question)
+        rr_documents = self.reranker.rerank(
+            question,
+            retrieved_documents
+        )
 
         prediction = self.generator.generate(
             question=question,
-            documents=retrieved_documents,
+            documents=rr_documents,
         )
 
         latency_ms = (time.perf_counter() - start) * 1000
@@ -72,6 +78,7 @@ class FinanceBenchRAGPipeline:
             question=question,
             prediction=prediction,
             retrieved_documents=retrieved_documents,
+            reranked_documents=rr_documents,
             latency_ms=latency_ms,
         )
     
@@ -83,8 +90,9 @@ class RetrievalPipeline(RAGPipeline):
     Useful for benchmarking retrieval metrics without calling an LLM.
     """
 
-    def __init__(self, retriever):
+    def __init__(self, retriever, reranker):
         self.retriever = retriever
+        self.reranker = reranker
 
     def invoke(
         self,
@@ -95,19 +103,21 @@ class RetrievalPipeline(RAGPipeline):
 
         docs = self.retriever.invoke(question)
 
+        reranked_docs = self.reranker.rerank(question, docs)
+
         latency_ms = (time.perf_counter() - start) * 1000
 
-        seen = set()
+        retrieved_seen = set()
         retrieved_documents = []
 
         for doc in docs:
 
             document_id = doc.metadata["document_id"]
 
-            if document_id in seen:
+            if document_id in retrieved_seen:
                 continue
 
-            seen.add(document_id)
+            retrieved_seen.add(document_id)
 
             retrieved_documents.append(
                 RetrievedDocument(
@@ -117,10 +127,33 @@ class RetrievalPipeline(RAGPipeline):
                     metadata=doc.metadata,
                 )
             )
+        
+        reranked_seen = set()
+        rr_documents = []
+
+        for doc in reranked_docs:
+
+            document_id = doc.metadata["document_id"]
+
+            if document_id in reranked_seen:
+                continue
+
+            reranked_seen.add(document_id)
+
+            rr_documents.append(
+                RetrievedDocument(
+                    document_id=document_id,
+                    score=doc.metadata.get("score"),
+                    rank=len(rr_documents) + 1,
+                    metadata=doc.metadata,
+                )
+            )
+
 
         return EvaluationResult(
             question=question,
             prediction="",          # No generation
             retrieved_documents=retrieved_documents,
+            reranked_documents=rr_documents,
             latency_ms=latency_ms,
         )

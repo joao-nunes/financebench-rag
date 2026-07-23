@@ -1,0 +1,21 @@
+{
+    "ROOT_DIR": "/Users/joaonunes/Documents/financebench-rag",
+    "DATA_DIR": "/Users/joaonunes/Documents/financebench-rag/data",
+    "FINANCEBENCH_DIR": "/Users/joaonunes/Documents/financebench-rag/data/financebench",
+    "PDF_DIR": "/Users/joaonunes/Documents/financebench-rag/data/financebench/pdfs",
+    "VECTORSTORE_DIR": "/Users/joaonunes/Documents/financebench-rag/data/vectorstore",
+    "EMBEDDING_MODEL": "BAAI/bge-base-en-v1.5",
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_DEVICE": "mps",
+    "CHUNK_SIZE": 500,
+    "CHUNK_OVERLAP": 100,
+    "TOP_K": 50,
+    "OPENAI_MODEL": "gpt-5-mini",
+    "TEMPERATURE": 0.0,
+    "MAX_TOKENS": 512,
+    "CACHE_DIR": "/Users/joaonunes/Documents/financebench-rag/data/cache",
+    "DOCUMENTS_CACHE": "/Users/joaonunes/Documents/financebench-rag/data/cache/documents.pkl",
+    "CHUNKS_CACHE": "/Users/joaonunes/Documents/financebench-rag/data/cache/chunks.pkl",
+    "INDEX_BATCH_SIZE": 512,
+    "CHECKPOINT_DIR": "/Users/joaonunes/Documents/financebench-rag/data/checkpoints/financebench"
+}
