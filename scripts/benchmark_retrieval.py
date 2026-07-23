@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.evaluation.writer import ExperimentWriter
 from src.chains.llm import get_llm
 from src.chains.prompts import get_rag_prompt
 from src.evaluation.benchmark import BenchmarkRunner
@@ -15,15 +16,23 @@ from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
 from src.evaluation.benchmark import BenchmarkWriter
 from src.retrieval.reranking import CrossEncoderReranker
-from src import config
-from src.utils.config_io import save_config
+
+
+EXPERIMENT_NAME = "baseline"
+RERANKER_MODEL = "BAAI/bge-reranker-base"
+RERANKER_TOP_K = 5
+SPLIT = "train"
+SEED = 42
 
 experiment_dir = Path("experiments/baseline")
 
-save_config(
-    config,
-    experiment_dir / "config.json",
-)
+from dataclasses import asdict
+import json
+from pathlib import Path
+
+from src.evaluation.models import BenchmarkResult
+
+
 VECTORSTORE_PATH = Path("./data/vectorstore")
 
 DATASET_PATH = Path(
@@ -86,9 +95,21 @@ metrics = pd.DataFrame(
         for r in results
     ]
 )
+writer = ExperimentWriter(experiment_dir)
 
+writer.save_benchmark_results(
+    results)
+
+writer.save_retrieval_failures(
+    results)
+
+
+writer.save_environment()
 print(metrics.mean())
-metrics.mean().to_csv("retrieval_metrics.csv")
+
+writer.save_metrics(
+    metrics.mean().to_dict(),
+)
 
 rows = []
 
@@ -105,10 +126,5 @@ for result in results:
 
         **result.retrieval_metrics.to_dict(),
     })
-
-pd.DataFrame(rows).to_csv(
-    "retrieval_results.csv",
-    index=False,
-)
 
 save_error_analysis(results)

@@ -17,5 +17,10 @@
     "DOCUMENTS_CACHE": "/Users/joaonunes/Documents/financebench-rag/data/cache/documents.pkl",
     "CHUNKS_CACHE": "/Users/joaonunes/Documents/financebench-rag/data/cache/chunks.pkl",
     "INDEX_BATCH_SIZE": 512,
-    "CHECKPOINT_DIR": "/Users/joaonunes/Documents/financebench-rag/data/checkpoints/financebench"
+    "CHECKPOINT_DIR": "/Users/joaonunes/Documents/financebench-rag/data/checkpoints/financebench",
+    "EXPERIMENT_NAME": "baseline",
+    "RERANKER_MODEL": "BAAI/bge-reranker-base",
+    "RERANKER_TOP_K": 5,
+    "SPLIT": "train",
+    "SEED": 42
 }

@@ -2,22 +2,44 @@ import json
 from pathlib import Path
 
 
-def save_config(config_module, output_path: str | Path) -> None:
+import json
+from pathlib import Path
+
+
+def save_experiment_config(
+    config_module,
+    output_path: str | Path,
+    **experiment_kwargs,
+) -> None:
     """
-    Save all uppercase configuration variables from a config module to JSON.
+    Save the project configuration together with
+    experiment-specific parameters.
+
+    Parameters
+    ----------
+    config_module
+        Python module containing the global configuration.
+    output_path
+        Destination JSON file.
+    experiment_kwargs
+        Extra experiment parameters.
     """
 
     config = {}
 
+    # Save all uppercase variables from config.py
     for key, value in vars(config_module).items():
+
         if not key.isupper():
             continue
 
-        # Convert Path objects to strings
         if isinstance(value, Path):
             value = str(value)
 
         config[key] = value
+
+    # Add experiment-specific settings
+    config.update(experiment_kwargs)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)

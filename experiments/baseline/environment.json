@@ -1,0 +1,30 @@
+{
+    "timestamp": "2026-07-23T14:36:38.967782",
+    "python": {
+        "version": "3.11.15 | packaged by conda-forge | (main, Jun 11 2026, 03:29:05) [Clang 19.1.7 ]",
+        "implementation": "CPython"
+    },
+    "system": {
+        "platform": "macOS-26.2-arm64-arm-64bit",
+        "system": "Darwin",
+        "release": "25.2.0",
+        "machine": "arm64",
+        "processor": "arm"
+    },
+    "git": {
+        "commit": "14e6f00cd2893fa240ef0e021866317cbaa0fe02"
+    },
+    "packages": {
+        "torch": "2.13.0",
+        "transformers": "5.14.1",
+        "sentence-transformers": "5.6.0",
+        "langchain": "1.3.14",
+        "langchain-community": "0.4.2",
+        "faiss-cpu": "1.11.0",
+        "faiss-gpu": null,
+        "openai": "2.46.0",
+        "numpy": "2.4.6",
+        "pandas": "3.0.3"
+    },
+    "command": "/Users/joaonunes/Documents/financebench-rag/scripts/benchmark_retrieval.py"
+}
