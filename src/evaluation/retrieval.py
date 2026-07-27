@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, asdict
 
-from src.evaluation.models import EvaluationResult, EvaluationSample
+from src.evaluation.models import BaseEvaluator, EvaluationResult, EvaluationSample
 
 from .metrics import (
     unbounded_recall,
@@ -26,7 +26,7 @@ class RetrievalMetrics:
         return asdict(self)
 
 
-class RetrievalEvaluator:
+class RetrievalEvaluator(BaseEvaluator):
 
     def evaluate(
         self,
@@ -36,8 +36,8 @@ class RetrievalEvaluator:
 
         relevant = {sample.source_document}
 
-        retrieved = [doc.document_id for doc in result.retrieved_documents]
-        reranked = [doc.document_id for doc in result.reranked_documents]
+        retrieved = self._aggregate_chunks(result.retrieved_chunks)
+        reranked = self._aggregate_chunks(result.reranked_chunks)
         return RetrievalMetrics(
 
             unbounded_recall=unbounded_recall(
@@ -80,3 +80,16 @@ class RetrievalEvaluator:
                 5,
             ),
         )
+
+    def _aggregate_chunks(self, chunks) -> list[str]:
+        seen = set()
+        documents = []
+
+        for chunk in chunks:
+            document_id = chunk.metadata["document_id"]
+
+            if document_id not in seen:
+                seen.add(document_id)
+                documents.append(document_id)
+
+        return documents

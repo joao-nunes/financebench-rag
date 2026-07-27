@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from src.evaluation.models import RetrievedDocument
+from src.evaluation.models import RetrievedChunk
 from sentence_transformers import CrossEncoder
 
 
@@ -13,8 +13,8 @@ class BaseReranker(ABC):
     def rerank(
         self,
         query: str,
-        documents: list[RetrievedDocument],
-    ) -> list[RetrievedDocument]:
+        documents: list[RetrievedChunk],
+    ) -> list[RetrievedChunk]:
         ...
 
 
@@ -23,9 +23,9 @@ class NoOpReranker(BaseReranker):
     def rerank(
         self,
         query: str,
-        documents: list[RetrievedDocument],
-    ) -> list[RetrievedDocument]:
-        return documents
+        chunks: list[RetrievedChunk],
+    ) -> list[RetrievedChunk]:
+        return chunks
     
 
 class CrossEncoderReranker(BaseReranker):
@@ -46,18 +46,18 @@ class CrossEncoderReranker(BaseReranker):
     def rerank(
         self,
         query: str,
-        documents: list[RetrievedDocument],
-    ) -> list[RetrievedDocument]:
+        chunks: list[RetrievedChunk],
+    ) -> list[RetrievedChunk]:
 
-        if not documents:
+        if not chunks:
             return []
 
         pairs = [
             (
                 query,
-                doc.page_content,
+                chunk.page_content,
             )
-            for doc in documents
+            for chunk in chunks
         ]
 
         scores = self._model.predict(
@@ -66,24 +66,23 @@ class CrossEncoderReranker(BaseReranker):
         )
 
         ranked = sorted(
-            zip(documents, scores),
+            zip(chunks, scores),
             key=lambda x: x[1],
             reverse=True,
         )
 
         reranked = []
 
-        for rank, (doc, score) in enumerate(
+        for _, (chunk, score) in enumerate(
             ranked[: self._top_n],
             start=1,
         ):
-
             reranked.append(
-                RetrievedDocument(
-                    document_id=doc.metadata["document_id"],
+                RetrievedChunk(
+                    document_id=chunk.document_id,
+                    page_content=chunk.page_content,
                     score=float(score),
-                    rank=rank,
-                    metadata=doc.metadata,
+                    metadata=chunk.metadata,
                 )
             )
 

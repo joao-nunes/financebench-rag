@@ -82,11 +82,13 @@ for benchmark_result in results[:5]:
 
     print("Retrieved:")
 
-    for doc in benchmark_result.result.retrieved_documents:
-
+    for rank, chunk in enumerate(
+        benchmark_result.result.reranked_chunks,
+        start=1,
+    ):
         print(
-            f"{doc.rank:>2}. "
-            f"{doc.document_id}"
+            f"{rank:>2}. "
+            f"{chunk.metadata['document_id']}"
         )
 
 metrics = pd.DataFrame(
@@ -110,21 +112,3 @@ print(metrics.mean())
 writer.save_metrics(
     metrics.mean().to_dict(),
 )
-
-rows = []
-
-for result in results:
-
-    rows.append({
-
-        "question": result.sample.question,
-
-        "expected": result.sample.source_document,
-
-        "retrieved_top1":
-            result.result.reranked_documents[0].document_id,
-
-        **result.retrieval_metrics.to_dict(),
-    })
-
-save_error_analysis(results)

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Generic, TypeVar
+
+
+from abc import ABC, abstractmethod
 
 
 @dataclass(slots=True)
@@ -12,17 +15,21 @@ class EvaluationSample:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass(slots=True)
-class RetrievedDocument:
-    """
-    One retrieved document/chunk.
-    """
-
+@dataclass
+class RetrievedChunk:
     document_id: str
+    page_content: str
     score: float
-    rank: int
+    metadata: dict[str, Any]
 
-    metadata: dict[str, Any] = field(default_factory=dict)
+@dataclass
+class RetrievedDocument:
+    document_id: str
+    page_content: str
+    score: float
+    metadata: dict[str, Any]
+
+    retrieved_chunks: list[RetrievedChunk] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -38,8 +45,8 @@ class EvaluationResult:
 
     prediction: str
 
-    retrieved_documents: list[RetrievedDocument]
-    reranked_documents: list[RetrievedDocument]
+    retrieved_chunks: list[RetrievedChunk]
+    reranked_chunks: list[RetrievedChunk]
 
     latency_ms: float
 
@@ -57,17 +64,21 @@ class RetrievalMetrics:
     mrr: float
     ndcg: float
 
+MetricType = TypeVar("MetricType")
 
-@dataclass(slots=True)
-class BenchmarkResult:
-    """
-    Stores the complete result of evaluating one sample.
-    """
-
+@dataclass
+class BenchmarkResult(Generic[MetricType]):
     sample: EvaluationSample
-
     result: EvaluationResult
+    metrics: MetricType
 
-    retrieval_metrics: RetrievalMetrics
 
-    metadata: dict[str, Any] = field(default_factory=dict)
+class BaseEvaluator(ABC):
+
+    @abstractmethod
+    def evaluate(
+        self,
+        sample: EvaluationSample,
+        result: EvaluationResult,
+    ):
+        ...

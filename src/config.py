@@ -20,13 +20,13 @@ EMBEDDING_DEVICE = "mps"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 
-TOP_K = 50
+TOP_K = 75
 
 # =========================
 # OpenAI
 # =========================
 
-OPENAI_MODEL = "gpt-5-mini"
+OPENAI_MODEL = "gpt-4.1"
 
 TEMPERATURE = 0.0
 

@@ -113,7 +113,7 @@ class ExperimentWriter:
                         result.sample.source_document,
                         " | ".join(
                             doc.document_id
-                            for doc in result.result.retrieved_documents
+                            for doc in result.result.retrieved_chunks
                         ),
                     ]
                 )

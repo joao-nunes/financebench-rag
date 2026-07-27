@@ -2,7 +2,7 @@ from pathlib import Path
 
 from src.chains.llm import get_llm
 from src.chains.prompts import get_rag_prompt
-from src.chains.rag_chain import create_rag_chain
+from src.chains.rag_chain import LangChainRAGPipeline, create_rag_chain
 
 from src.retrieval.retrievers import create_retriever
 

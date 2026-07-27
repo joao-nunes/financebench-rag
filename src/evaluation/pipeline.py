@@ -9,6 +9,7 @@ import time
 from src.evaluation.models import (
     EvaluationResult,
     RetrievedDocument,
+    RetrievedChunk,
 )
 
 class RAGPipeline(Protocol):
@@ -61,24 +62,45 @@ class FinanceBenchRAGPipeline:
 
         start = time.perf_counter()
 
-        retrieved_documents = self.retriever.retrieve(question)
-        rr_documents = self.reranker.rerank(
-            question,
-            retrieved_documents
-        )
+        retrieved_chunks = self.retriever.invoke(question)
+        
+        retrieved_chunks = [
+                RetrievedChunk(
+                    document_id=doc.metadata["document_id"],
+                    page_content=doc.page_content,
+                    score=doc.metadata.get("score"),
+                    metadata=doc.metadata,
+                )
+                for doc in retrieved_chunks
+        ]
 
-        prediction = self.generator.generate(
-            question=question,
-            documents=rr_documents,
-        )
+        reranked_chunks = self.reranker.rerank(question, retrieved_chunks)
+
+        reranked_chunks = [
+            RetrievedChunk(
+                document_id=doc.metadata["document_id"],
+                page_content=doc.page_content,
+                score=doc.score,      # or doc.metadata["score"], depending on your reranker
+                metadata=doc.metadata,
+            )
+            for doc in reranked_chunks
+            ]
 
         latency_ms = (time.perf_counter() - start) * 1000
+
+        # Generation
+        prediction = self.generator.invoke(
+            {
+                "question": question,
+                "context": reranked_chunks,
+            }
+        )
 
         return EvaluationResult(
             question=question,
             prediction=prediction,
-            retrieved_documents=retrieved_documents,
-            reranked_documents=rr_documents,
+            retrieved_chunks=retrieved_chunks,
+            reranked_chunks=reranked_chunks,
             latency_ms=latency_ms,
         )
     
@@ -101,59 +123,37 @@ class RetrievalPipeline(RAGPipeline):
 
         start = time.perf_counter()
 
-        docs = self.retriever.invoke(question)
+        retrieved_chunks = self.retriever.invoke(question)
+        
+        retrieved_chunks = [
+                RetrievedChunk(
+                    document_id=doc.metadata["document_id"],
+                    page_content=doc.page_content,
+                    score=doc.metadata.get("score"),
+                    metadata=doc.metadata,
+                )
+                for doc in retrieved_chunks
+        ]
 
-        reranked_docs = self.reranker.rerank(question, docs)
+        reranked_chunks = self.reranker.rerank(question, retrieved_chunks)
+
+        reranked_chunks = [
+            RetrievedChunk(
+                document_id=doc.metadata["document_id"],
+                page_content=doc.page_content,
+                score=doc.score,      # or doc.metadata["score"], depending on your reranker
+                metadata=doc.metadata,
+            )
+            for doc in reranked_chunks
+            ]
 
         latency_ms = (time.perf_counter() - start) * 1000
-
-        retrieved_seen = set()
-        retrieved_documents = []
-
-        for doc in docs:
-
-            document_id = doc.metadata["document_id"]
-
-            if document_id in retrieved_seen:
-                continue
-
-            retrieved_seen.add(document_id)
-
-            retrieved_documents.append(
-                RetrievedDocument(
-                    document_id=document_id,
-                    score=doc.metadata.get("score"),
-                    rank=len(retrieved_documents) + 1,
-                    metadata=doc.metadata,
-                )
-            )
-        
-        reranked_seen = set()
-        rr_documents = []
-
-        for doc in reranked_docs:
-
-            document_id = doc.metadata["document_id"]
-
-            if document_id in reranked_seen:
-                continue
-
-            reranked_seen.add(document_id)
-
-            rr_documents.append(
-                RetrievedDocument(
-                    document_id=document_id,
-                    score=doc.metadata.get("score"),
-                    rank=len(rr_documents) + 1,
-                    metadata=doc.metadata,
-                )
-            )
 
 
         return EvaluationResult(
             question=question,
             prediction="",          # No generation
-            retrieved_documents=retrieved_documents,
-            reranked_documents=rr_documents,
+            retrieved_chunks=retrieved_chunks,
+            reranked_chunks=reranked_chunks,
             latency_ms=latency_ms,
         )

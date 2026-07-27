@@ -1,28 +1,26 @@
 from __future__ import annotations
 
-from .dataset import EvaluationDataset
-from .models import BenchmarkResult
-from .pipeline import RAGPipeline
-from .retrieval import RetrievalEvaluator
+from src.evaluation.dataset import EvaluationDataset
+from src.evaluation.models import BenchmarkResult
+from src.evaluation.pipeline import RAGPipeline
+from src.evaluation.models import BaseEvaluator
 from collections.abc import Iterator
 from tqdm.auto import tqdm
 
 import json
 from pathlib import Path
 
-from src.evaluation.models import BenchmarkResult
 from dataclasses import asdict
 
 class BenchmarkRunner:
-    """Runs a benchmark over an evaluation dataset."""
 
     def __init__(
         self,
         rag_pipeline: RAGPipeline,
-        retrieval_evaluator: RetrievalEvaluator,
-    ) -> None:
+        evaluator: BaseEvaluator,
+    ):
         self._rag_pipeline = rag_pipeline
-        self._retrieval_evaluator = retrieval_evaluator
+        self._evaluator = evaluator
 
     def evaluate(
         self,
@@ -47,17 +45,15 @@ class BenchmarkRunner:
                 sample.question
             )
 
-            retrieval_metrics = (
-                self._retrieval_evaluator.evaluate(
-                    sample,
-                    pipeline_result,
-                )
+            metrics = self._evaluator.evaluate(
+                sample,
+                pipeline_result,
             )
 
             yield BenchmarkResult(
                 sample=sample,
                 result=pipeline_result,
-                retrieval_metrics=retrieval_metrics,
+                metrics=metrics,
             )
 
 class BenchmarkWriter:
