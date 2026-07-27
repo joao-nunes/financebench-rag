@@ -60,7 +60,7 @@ runner = BenchmarkRunner(
 
 dataset = FinanceBenchDataset.from_jsonl(DATASET_PATH)
 split = Split.load("data/financebench/splits")
-dataset = dataset.subset(split.validation_ids)
+dataset = dataset.subset(split.train_ids)
 
 results = runner.evaluate(dataset)
 

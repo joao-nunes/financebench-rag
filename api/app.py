@@ -1,0 +1,11 @@
+from fastapi import FastAPI
+
+from api.lifespan import lifespan
+from api.routes import router
+
+app = FastAPI(
+    title="Simple RAG API",
+    lifespan=lifespan,
+)
+
+app.include_router(router)

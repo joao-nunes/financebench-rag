@@ -58,7 +58,7 @@ pipeline = RetrievalPipeline(retriever, reranker)
 
 runner = BenchmarkRunner(
     rag_pipeline=pipeline,
-    retrieval_evaluator=RetrievalEvaluator(),
+    evaluator=RetrievalEvaluator(),
 )
 
 dataset = FinanceBenchDataset.from_jsonl(DATASET_PATH)
@@ -93,7 +93,7 @@ for benchmark_result in results[:5]:
 
 metrics = pd.DataFrame(
     [
-        r.retrieval_metrics.to_dict()
+        r.metrics.to_dict()
         for r in results
     ]
 )

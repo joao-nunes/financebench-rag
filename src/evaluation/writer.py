@@ -104,7 +104,7 @@ class ExperimentWriter:
 
             for result in benchmark_results:
 
-                if result.retrieval_metrics.unbounded_recall == 1.0:
+                if result.metrics.unbounded_recall == 1.0:
                     continue
 
                 writer.writerow(
