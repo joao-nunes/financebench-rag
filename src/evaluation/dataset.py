@@ -70,15 +70,6 @@ class FinanceBenchDataset(EvaluationDataset):
         self._samples = samples
 
 
-class FinanceBenchDataset(EvaluationDataset):
-
-    def __init__(
-        self,
-        samples: list[EvaluationSample],
-    ):
-        self._samples = samples
-
-
 
     @classmethod
     def from_jsonl(
