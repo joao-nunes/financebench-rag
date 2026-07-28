@@ -6,6 +6,8 @@ from typing import Any, Generic, TypeVar
 
 from abc import ABC, abstractmethod
 
+from src.retrieval.models import RetrievalResult
+
 
 @dataclass(slots=True)
 class EvaluationSample:
@@ -15,12 +17,6 @@ class EvaluationSample:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
-class RetrievedChunk:
-    document_id: str
-    page_content: str
-    score: float
-    metadata: dict[str, Any]
 
 @dataclass
 class RetrievedDocument:
@@ -29,7 +25,7 @@ class RetrievedDocument:
     score: float
     metadata: dict[str, Any]
 
-    retrieved_chunks: list[RetrievedChunk] = field(default_factory=list)
+    retrieved_chunks: list[RetrievalResult] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -45,8 +41,8 @@ class EvaluationResult:
 
     prediction: str
 
-    retrieved_chunks: list[RetrievedChunk]
-    reranked_chunks: list[RetrievedChunk]
+    retrieved_chunks: list[RetrievalResult]
+    reranked_chunks: list[RetrievalResult]
 
     latency_ms: float
 

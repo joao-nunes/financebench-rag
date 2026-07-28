@@ -4,7 +4,7 @@ from src.retrieval import Retriever
 from src.retrieval.reranking import Reranker
 from src.generation import Generator
 from src.prompting import PromptBuilder
-from src.retrieval.types import RetrievalResult
+from src.retrieval.models import RetrievalResult
 
 
 @dataclass(slots=True)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from src.evaluation.models import RetrievedChunk
+from src.retrieval.models import RetrievalResult
 from sentence_transformers import CrossEncoder
 
 
@@ -13,8 +13,8 @@ class BaseReranker(ABC):
     def rerank(
         self,
         query: str,
-        documents: list[RetrievedChunk],
-    ) -> list[RetrievedChunk]:
+        documents: list[RetrievalResult],
+    ) -> list[RetrievalResult]:
         ...
 
 
@@ -23,8 +23,8 @@ class NoOpReranker(BaseReranker):
     def rerank(
         self,
         query: str,
-        chunks: list[RetrievedChunk],
-    ) -> list[RetrievedChunk]:
+        chunks: list[RetrievalResult],
+    ) -> list[RetrievalResult]:
         return chunks
     
 
@@ -46,8 +46,8 @@ class CrossEncoderReranker(BaseReranker):
     def rerank(
         self,
         query: str,
-        chunks: list[RetrievedChunk],
-    ) -> list[RetrievedChunk]:
+        chunks: list[RetrievalResult],
+    ) -> list[RetrievalResult]:
 
         if not chunks:
             return []
@@ -78,7 +78,7 @@ class CrossEncoderReranker(BaseReranker):
             start=1,
         ):
             reranked.append(
-                RetrievedChunk(
+                RetrievalResult(
                     document_id=chunk.document_id,
                     page_content=chunk.page_content,
                     score=float(score),

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.generation.templates import RAG_PROMPT
-from src.retrieval.retrievers import RetrievalResult
+from src.retrieval.models import RetrievalResult
 
 
 class PromptBuilder(ABC):
