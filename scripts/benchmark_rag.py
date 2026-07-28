@@ -14,7 +14,7 @@ from src.evaluation.writer import ExperimentWriter
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
 from src.retrieval.reranking import CrossEncoderReranker
-from src.retrieval.retrievers import create_retriever
+from retrieval.faiss_retriever import create_retriever
 
 EXPERIMENT_NAME = "baseline_rag"
 

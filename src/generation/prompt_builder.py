@@ -26,7 +26,7 @@ class SimplePromptBuilder(PromptBuilder):
     ) -> str:
 
         documents = "\n\n".join(
-            f"[Document {i+1}]\n{doc.page_content}"
+            f"[Document {i+1}]\n{doc.content}"
             for i, doc in enumerate(context)
         )
 

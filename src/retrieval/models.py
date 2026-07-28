@@ -5,6 +5,6 @@ from dataclasses import dataclass
 @dataclass(slots=True)
 class RetrievalResult:
     document_id: str
-    page_content: str
+    content: str
     score: float
     metadata: dict[str, Any]

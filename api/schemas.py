@@ -8,7 +8,7 @@ class ChatRequest(BaseModel):
 class Source(BaseModel):
     document_id: str
     score: float
-    text: str
+    content: str
 
 
 class ChatResponse(BaseModel):

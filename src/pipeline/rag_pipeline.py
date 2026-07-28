@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from src.retrieval import Retriever
-from src.retrieval.reranking import Reranker
-from src.generation import Generator
-from src.prompting import PromptBuilder
+from src.retrieval.retriever import Retriever
+from src.retrieval.reranking import CrossEncoderReranker
+from src.generation.generator import Generator
+from src.generation.prompt_builder import PromptBuilder
 from src.retrieval.models import RetrievalResult
 
 
@@ -19,7 +19,7 @@ class RAGPipeline:
     def __init__(
         self,
         retriever: Retriever,
-        reranker: Reranker,
+        reranker: CrossEncoderReranker,
         prompt_builder: PromptBuilder,
         generator: Generator,
     ) -> None:
@@ -38,7 +38,7 @@ class RAGPipeline:
 
         reranked = self.reranker.rerank(
             query=question,
-            documents=retrieved,
+            chunks=retrieved,
         )
 
         prompt = self.prompt_builder.build(

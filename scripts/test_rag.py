@@ -4,7 +4,7 @@ from src.chains.llm import get_llm
 from src.chains.prompts import get_rag_prompt
 from src.chains.rag_chain import LangChainRAGPipeline, create_rag_chain
 
-from src.retrieval.retrievers import create_retriever
+from retrieval.faiss_retriever import create_retriever
 
 from src.indexing.faiss_store import FAISSStore
 from src.indexing.embeddings import get_embedding_model

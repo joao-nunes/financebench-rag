@@ -55,7 +55,7 @@ class CrossEncoderReranker(BaseReranker):
         pairs = [
             (
                 query,
-                chunk.page_content,
+                chunk.content,
             )
             for chunk in chunks
         ]
@@ -80,7 +80,7 @@ class CrossEncoderReranker(BaseReranker):
             reranked.append(
                 RetrievalResult(
                     document_id=chunk.document_id,
-                    page_content=chunk.page_content,
+                    content=chunk.content,
                     score=float(score),
                     metadata=chunk.metadata,
                 )

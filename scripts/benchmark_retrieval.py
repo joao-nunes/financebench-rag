@@ -11,7 +11,7 @@ from src.evaluation.pipeline import RetrievalPipeline
 from src.evaluation.retrieval import RetrievalEvaluator
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
-from src.retrieval.retrievers import create_retriever
+from retrieval.faiss_retriever import create_retriever
 from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
 from src.evaluation.benchmark import BenchmarkWriter
