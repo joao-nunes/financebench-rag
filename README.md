@@ -79,7 +79,6 @@ financebench-rag/
 │   ├── evaluation/
 │   └── config.py
 │
-│
 ├── scripts/
 ├── data/
 ├── tests/
