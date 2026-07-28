@@ -14,7 +14,7 @@ The project was built to explore the software engineering principles behind mode
 * Modular pipeline architecture
 * FastAPI REST API
 * Dependency injection and lifecycle management
-* Separation between domain models and API schemas
+* Clear separation between the core RAG pipeline and the REST API layer
 * Easily extensible abstractions for retrieval, reranking, prompt building, and generation
 
 ---
