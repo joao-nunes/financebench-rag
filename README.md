@@ -97,16 +97,25 @@ git clone https://github.com/joao-nunes/financebench-rag.git
 cd financebench-rag
 ```
 
-Create a virtual environment
+### Option 1: Conda
+
+```bash
+conda create -n financebench-rag python 3.11.15
+conda activate financebench-rag
+pip install -r requirements.txt
+```
+
+### Option 2: Python virtual environment
 
 ```bash
 python -m venv .venv
+
+# Linux / macOS
 source .venv/bin/activate
-```
 
-Install the dependencies
+# Windows
+.venv\Scripts\activate
 
-```bash
 pip install -r requirements.txt
 ```
 
