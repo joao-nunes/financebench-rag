@@ -5,6 +5,10 @@ from api.schemas import ChatRequest, ChatResponse
 from src.pipeline.service import RAGService
 from api.schemas import Source
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 @router.post("/chat", response_model=ChatResponse)

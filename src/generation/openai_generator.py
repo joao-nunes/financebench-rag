@@ -6,6 +6,9 @@ from src.generation.generator import Generator
 import os
 from openai import OpenAI
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class OpenAIGenerator(Generator):
 

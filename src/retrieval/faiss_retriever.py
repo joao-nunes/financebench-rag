@@ -10,6 +10,10 @@ from src.config import TOP_K
 from src.retrieval.models import RetrievalResult
 from src.retrieval.retriever import Retriever
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def create_retriever(
     vectorstore: FAISS,
 ) -> VectorStoreRetriever:

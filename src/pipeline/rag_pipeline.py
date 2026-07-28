@@ -6,6 +6,9 @@ from src.generation.generator import Generator
 from src.generation.prompt_builder import PromptBuilder
 from src.retrieval.models import RetrievalResult
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @dataclass(slots=True)
 class PipelineResponse:
@@ -36,18 +39,26 @@ class RAGPipeline:
 
         retrieved = self.retriever.retrieve(question)
 
+        logger.info("Retrieved %d candidate chunks", len(retrieved))
+
         reranked = self.reranker.rerank(
             query=question,
             chunks=retrieved,
         )
+
+        logger.info("Reranked to top %d chunks", len(reranked))
 
         prompt = self.prompt_builder.build(
             question=question,
             context=reranked,
         )
 
+        logger.info("Generating answer")
+
         answer = self.generator.generate(prompt)
 
+        logger.info("Pipeline completed successfully")
+        
         return PipelineResponse(
             answer=answer,
             prompt=prompt,

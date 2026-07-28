@@ -11,9 +11,13 @@ from src.generation.openai_generator import OpenAIGenerator
 
 from pathlib import Path
 from src.indexing.embeddings import get_embedding_model
+from src.logging_config import configure_logging
+
 
 @asynccontextmanager
 async def lifespan(app):
+    
+    configure_logging()
 
     VECTORSTORE_PATH = Path("./data/vectorstore")
     embedding_model = get_embedding_model()
