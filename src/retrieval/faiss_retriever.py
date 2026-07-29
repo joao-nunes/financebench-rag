@@ -3,10 +3,6 @@ from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_community.vectorstores import FAISS
 
 from src.config import TOP_K
-from langchain_core.vectorstores import VectorStoreRetriever
-from langchain_community.vectorstores import FAISS
-
-from src.config import TOP_K
 from src.retrieval.models import RetrievalResult
 from src.retrieval.retriever import Retriever
 
