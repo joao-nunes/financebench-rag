@@ -4,7 +4,11 @@ from abc import ABC, abstractmethod
 
 from src.retrieval.models import RetrievalResult
 from sentence_transformers import CrossEncoder
+from src.logging_config import logging
+from src.exceptions import RerankingError
 
+
+logger = logging.getLogger(__name__)
 
 class BaseReranker(ABC):
     """Base interface for document rerankers."""
@@ -51,39 +55,47 @@ class CrossEncoderReranker(BaseReranker):
 
         if not chunks:
             return []
-
-        pairs = [
-            (
-                query,
-                chunk.content,
-            )
-            for chunk in chunks
-        ]
-
-        scores = self._model.predict(
-            pairs,
-            convert_to_numpy=True,
-        )
-
-        ranked = sorted(
-            zip(chunks, scores),
-            key=lambda x: x[1],
-            reverse=True,
-        )
-
-        reranked = []
-
-        for _, (chunk, score) in enumerate(
-            ranked[: self._top_n],
-            start=1,
-        ):
-            reranked.append(
-                RetrievalResult(
-                    document_id=chunk.document_id,
-                    content=chunk.content,
-                    score=float(score),
-                    metadata=chunk.metadata,
+        try:
+            pairs = [
+                (
+                    query,
+                    chunk.content,
                 )
+                for chunk in chunks
+            ]
+
+            scores = self._model.predict(
+                pairs,
+                convert_to_numpy=True,
             )
 
-        return reranked
+            ranked = sorted(
+                zip(chunks, scores),
+                key=lambda x: x[1],
+                reverse=True,
+            )
+
+            reranked = []
+
+            for _, (chunk, score) in enumerate(
+                ranked[: self._top_n],
+                start=1,
+            ):
+                reranked.append(
+                    RetrievalResult(
+                        document_id=chunk.document_id,
+                        content=chunk.content,
+                        score=float(score),
+                        metadata=chunk.metadata,
+                    )
+                )
+
+            return reranked
+        
+        except Exception as e:
+            logger.debug(
+                "CrossEncoder reranking failed for %d chunks.",
+                len(chunks),
+                exc_info=True,
+            )
+            raise RerankingError("Failed to rerank retrieved documents.") from e

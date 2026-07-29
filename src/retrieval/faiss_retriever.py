@@ -5,10 +5,12 @@ from langchain_community.vectorstores import FAISS
 from src.config import TOP_K
 from src.retrieval.models import RetrievalResult
 from src.retrieval.retriever import Retriever
+from src.exceptions import RetrievalError
 
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def create_retriever(
     vectorstore: FAISS,
@@ -50,9 +52,9 @@ class FAISSRetriever(Retriever):
         query: str,
     ) -> list[RetrievalResult]:
 
-        documents = self.retriever.invoke(query)
-
-        return [
+        try: 
+            documents = self.retriever.invoke(query)
+            return [
             RetrievalResult(
                 document_id=doc.metadata.get("id", str(i)),
                 content=doc.page_content,
@@ -60,4 +62,11 @@ class FAISSRetriever(Retriever):
                 metadata=doc.metadata,
             )
             for i, doc in enumerate(documents)
-        ]
+            ]
+        except Exception as e:
+            logger.debug("Failed to retrieve chunks from the vector store.",
+                         exc_info=True,
+            )
+            raise RetrievalError("Chunk retrieval failed.") from e
+
+        

@@ -1,7 +1,7 @@
 from openai import OpenAI
 
 from src.generation.generator import Generator
-
+from src.exceptions import GenerationError
 
 import os
 from openai import OpenAI
@@ -24,9 +24,11 @@ class OpenAIGenerator(Generator):
 
     def generate(self, prompt: str) -> str:
 
-        response = self.client.responses.create(
-            model=self.model,
-            input=prompt,
-        )
-
+        try:
+            response = self.client.responses.create(
+                model=self.model,
+                input=prompt,
+            )
+        except Exception as e:
+            raise GenerationError("Failed to generate response.") from e
         return response.output_text
