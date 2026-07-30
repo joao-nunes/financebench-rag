@@ -116,7 +116,7 @@ financebench-rag/
 ### Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/financebench-rag.git
+git clone https://github.com/joao-nunes/financebench-rag.git
 cd financebench-rag
 ```
 
