@@ -7,6 +7,7 @@ from langchain_core.embeddings import Embeddings
 
 from src.indexing.faiss_store import FAISSStore
 
+
 def create_vectorstore(
     documents: list[Document],
     embedding_model: HuggingFaceEmbeddings,

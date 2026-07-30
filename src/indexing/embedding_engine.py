@@ -96,8 +96,7 @@ class EmbeddingEngine:
         elapsed = time.perf_counter() - start_time
 
         logger.info(
-            "Finished embedding %d documents in %.1f seconds "
-            "(%.1f docs/s)",
+            "Finished embedding %d documents in %.1f seconds " "(%.1f docs/s)",
             total_docs,
             elapsed,
             total_docs / elapsed,

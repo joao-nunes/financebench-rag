@@ -68,16 +68,9 @@ writer = ExperimentWriter(EXPERIMENT_DIR)
 
 writer.save_benchmark_results(results)
 
-metrics = pd.DataFrame(
-    [
-        r.metrics.to_dict()
-        for r in results
-    ]
-)
+metrics = pd.DataFrame([r.metrics.to_dict() for r in results])
 
-writer.save_metrics(
-    metrics.mean().to_dict()
-)
+writer.save_metrics(metrics.mean().to_dict())
 
 writer.save_environment()
 

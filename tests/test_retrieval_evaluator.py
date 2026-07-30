@@ -16,19 +16,16 @@ def test_retrieval_evaluator():
     )
 
     retrieved = [
-
         RetrievedDocument(
             document_id="APPLE_2021_10K",
             score=0.91,
             rank=1,
         ),
-
         RetrievedDocument(
             document_id="APPLE_2022_10K",
             score=0.90,
             rank=2,
         ),
-
         RetrievedDocument(
             document_id="MSFT_2022_10K",
             score=0.83,
@@ -37,13 +34,9 @@ def test_retrieval_evaluator():
     ]
 
     result = EvaluationResult(
-
         question=sample.question,
-
         prediction="$394B",
-
         retrieved_documents=retrieved,
-
         latency_ms=120,
     )
 

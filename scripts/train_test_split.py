@@ -2,7 +2,6 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 from pathlib import Path
 
-
 # Load the benchmark
 df = pd.read_csv("data/financebench/benchmark.csv")
 df["company"] = df["company"].str.upper()
@@ -53,4 +52,3 @@ split_info = {
 
 with open(split_dir / "split_info.json", "w") as f:
     json.dump(split_info, f, indent=4)
-

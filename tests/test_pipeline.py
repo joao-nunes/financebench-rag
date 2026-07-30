@@ -15,13 +15,11 @@ def test_pipeline():
     sample = dataset.load()[0]
 
     retrieved = [
-
         RetrievedDocument(
             document_id=sample.source_document,
             score=0.98,
             rank=1,
         ),
-
         RetrievedDocument(
             document_id="OTHER_DOC",
             score=0.91,
@@ -30,13 +28,9 @@ def test_pipeline():
     ]
 
     result = EvaluationResult(
-
         question=sample.question,
-
         prediction=sample.reference_answer,
-
         retrieved_documents=retrieved,
-
         latency_ms=95,
     )
 

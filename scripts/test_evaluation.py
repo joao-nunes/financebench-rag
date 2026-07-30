@@ -7,10 +7,7 @@ from src.evaluation.models import (
 )
 from src.evaluation.retrieval import RetrievalEvaluator
 
-
-dataset = FinanceBenchDataset(
-    "./data/financebench/data/financebench_open_source.jsonl"
-)
+dataset = FinanceBenchDataset("./data/financebench/data/financebench_open_source.jsonl")
 
 sample = dataset.load()[0]
 

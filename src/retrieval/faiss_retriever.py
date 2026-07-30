@@ -35,6 +35,7 @@ def retrieve(
 
     return retriever.invoke(query)
 
+
 class FAISSRetriever(Retriever):
 
     def __init__(
@@ -52,21 +53,20 @@ class FAISSRetriever(Retriever):
         query: str,
     ) -> list[RetrievalResult]:
 
-        try: 
+        try:
             documents = self.retriever.invoke(query)
             return [
-            RetrievalResult(
-                document_id=doc.metadata.get("id", str(i)),
-                content=doc.page_content,
-                score=0.0,
-                metadata=doc.metadata,
-            )
-            for i, doc in enumerate(documents)
+                RetrievalResult(
+                    document_id=doc.metadata.get("id", str(i)),
+                    content=doc.page_content,
+                    score=0.0,
+                    metadata=doc.metadata,
+                )
+                for i, doc in enumerate(documents)
             ]
         except Exception as e:
-            logger.debug("Failed to retrieve chunks from the vector store.",
-                         exc_info=True,
+            logger.debug(
+                "Failed to retrieve chunks from the vector store.",
+                exc_info=True,
             )
             raise RetrievalError("Chunk retrieval failed.") from e
-
-        

@@ -11,6 +11,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(slots=True)
 class PipelineResponse:
     answer: str
@@ -45,7 +46,7 @@ class RAGPipeline:
             retrieved = self.retriever.retrieve(question)
             metrics.retrieved_documents = len(retrieved)
             metrics.retrieval_time = time.perf_counter() - start
-            logger.info( "Retrieved %d candidate chunks", metrics.retrieved_documents)
+            logger.info("Retrieved %d candidate chunks", metrics.retrieved_documents)
 
             start = time.perf_counter()
             reranked = self.reranker.rerank(
@@ -55,7 +56,6 @@ class RAGPipeline:
             metrics.reranked_documents = len(reranked)
             metrics.reranking_time = time.perf_counter() - start
             logger.info("Reranked to top %d chunks", metrics.reranked_documents)
-
 
             start = time.perf_counter()
             prompt = self.prompt_builder.build(
@@ -76,7 +76,7 @@ class RAGPipeline:
             metrics.pipeline_time = time.perf_counter() - pipeline_start
 
             logger.info("Pipeline completed successfully")
-            
+
             logger.info(
                 "Pipeline metrics | total=%.3fs | retrieval=%.3fs | reranking=%.3fs | prompt=%.3fs | generation=%.3fs | retrieved=%d | reranked=%d | prompt_length=%d",
                 metrics.pipeline_time,
@@ -87,7 +87,7 @@ class RAGPipeline:
                 metrics.retrieved_documents,
                 metrics.reranked_documents,
                 metrics.prompt_length,
-    )
+            )
 
             return PipelineResponse(
                 answer=answer,

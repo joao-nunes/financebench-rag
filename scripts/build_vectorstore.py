@@ -5,7 +5,7 @@ from src.config import (
     DOCUMENTS_CACHE,
     PDF_DIR,
     VECTORSTORE_DIR,
-    CHECKPOINT_DIR
+    CHECKPOINT_DIR,
 )
 
 from src.ingestion.loaders import load_pdf
@@ -33,9 +33,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Ignore cache and rebuild all artifacts."
+        "--rebuild", action="store_true", help="Ignore cache and rebuild all artifacts."
     )
 
     args = parser.parse_args()
@@ -49,7 +47,6 @@ def main():
     print("=" * 80)
     print(f"Found {len(pdf_files)} PDFs")
     print("=" * 80)
-
 
     if cache_exists(DOCUMENTS_CACHE) and not args.rebuild:
         print("Loading cached documents...")

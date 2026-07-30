@@ -55,19 +55,17 @@ class FAISSStore:
         self.add(embeddings, documents)
 
     def add(
-    self,
-    embeddings: Sequence[Sequence[float]],
-    documents: Sequence[Document],
-) -> None:
+        self,
+        embeddings: Sequence[Sequence[float]],
+        documents: Sequence[Document],
+    ) -> None:
 
         if self._store is None:
             raise RuntimeError("Index has not been initialized.")
 
         text_embeddings = [
-            (doc.page_content, emb)
-            for doc, emb in zip(documents, embeddings)
+            (doc.page_content, emb) for doc, emb in zip(documents, embeddings)
         ]
-
 
         embeddings = np.asarray(embeddings, dtype=np.float32)
 
@@ -82,7 +80,7 @@ class FAISSStore:
 
         if np.isinf(embeddings).any():
             raise ValueError("Embeddings contain Inf")
-        
+
         logger.info(
             "Batch stats | min=%f max=%f mean=%f",
             embeddings.min(),
@@ -106,7 +104,6 @@ class FAISSStore:
         path.mkdir(parents=True, exist_ok=True)
 
         self._store.save_local(str(path))
-
 
     def load(
         self,

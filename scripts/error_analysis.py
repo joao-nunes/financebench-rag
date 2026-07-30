@@ -27,41 +27,22 @@ def save_error_analysis(
         sample = result.sample
         retrieved = result.result.retrieved_documents
 
-        retrieved_ids = [
-            doc.document_id
-            for doc in retrieved
-        ]
+        retrieved_ids = [doc.document_id for doc in retrieved]
 
-        retrieved_scores = [
-            doc.score
-            for doc in retrieved
-        ]
+        retrieved_scores = [doc.score for doc in retrieved]
 
         row = {
-
             "question": sample.question,
-
             "expected_document": sample.source_document,
-
             "unbounded_recall": result.retrieval_metrics.unbounded_recall,
-
             "recall_at_1": result.retrieval_metrics.recall_at_1,
-
             "recall_at_5": result.retrieval_metrics.recall_at_5,
-
             "mrr": result.retrieval_metrics.mrr,
-
             "ndcg_at_5": result.retrieval_metrics.ndcg_at_5,
-
-            "retrieved_documents": " | ".join(
-                retrieved_ids
-            ),
-
+            "retrieved_documents": " | ".join(retrieved_ids),
             "retrieval_scores": " | ".join(
                 [
-                    f"{score:.4f}"
-                    if score is not None
-                    else "None"
+                    f"{score:.4f}" if score is not None else "None"
                     for score in retrieved_scores
                 ]
             ),
@@ -87,10 +68,6 @@ def save_error_analysis(
         index=False,
     )
 
-    print(
-        f"Saved {len(rows)} benchmark results."
-    )
+    print(f"Saved {len(rows)} benchmark results.")
 
-    print(
-        f"Saved {len(error_rows)} retrieval failures."
-    )
+    print(f"Saved {len(error_rows)} retrieval failures.")

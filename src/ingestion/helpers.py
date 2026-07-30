@@ -1,5 +1,6 @@
 import re
 
+
 def enrich_chunk(document):
     """
     Prepend document metadata to the chunk text before embedding.

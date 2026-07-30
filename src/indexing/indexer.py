@@ -11,7 +11,6 @@ from src.indexing.embedding_engine import EmbeddingEngine
 from src.indexing.faiss_store import FAISSStore
 from src.utils.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 

@@ -11,3 +11,10 @@ requires-python = ">=3.11"
 
 [tool.setuptools]
 packages = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

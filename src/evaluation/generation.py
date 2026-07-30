@@ -18,7 +18,7 @@ class GenerationMetrics:
             "faithfulness": self.faithfulness,
             "answer_correctness": self.answer_correctness,
         }
-    
+
 
 class GenerationEvaluator:
 
@@ -44,4 +44,3 @@ class GenerationEvaluator:
             faithfulness=scores.faithfulness,
             answer_correctness=scores.answer_correctness,
         )
-        

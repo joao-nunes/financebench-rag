@@ -17,7 +17,6 @@ class EvaluationSample:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-
 @dataclass
 class RetrievedDocument:
     document_id: str
@@ -60,7 +59,9 @@ class RetrievalMetrics:
     mrr: float
     ndcg: float
 
+
 MetricType = TypeVar("MetricType")
+
 
 @dataclass
 class BenchmarkResult(Generic[MetricType]):
@@ -76,5 +77,4 @@ class BaseEvaluator(ABC):
         self,
         sample: EvaluationSample,
         result: EvaluationResult,
-    ):
-        ...
+    ): ...

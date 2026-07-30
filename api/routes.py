@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+
 @router.post("/chat", response_model=ChatResponse)
 def chat(
     request: ChatRequest,

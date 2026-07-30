@@ -6,7 +6,7 @@ from src.exceptions import (
     RerankingError,
     PromptBuildError,
     GenerationError,
-    RAGException
+    RAGException,
 )
 
 
@@ -59,7 +59,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "detail": "The language model failed to generate a response.",
             },
         )
-    
+
     @app.exception_handler(RAGException)
     async def rag_exception_handler(
         request: Request,

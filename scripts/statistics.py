@@ -19,11 +19,7 @@ print(f"Total documents : {df['source_document'].nunique()}")
 # Questions per company
 # =============================================================================
 
-company_counts = (
-    df["company"]
-    .value_counts()
-    .sort_values(ascending=False)
-)
+company_counts = df["company"].value_counts().sort_values(ascending=False)
 
 print("\nQuestions per company")
 print(company_counts)
@@ -43,9 +39,7 @@ print(f"Maximum questions/company : {company_counts.max()}")
 # =============================================================================
 
 docs_per_company = (
-    df.groupby("company")["source_document"]
-    .nunique()
-    .sort_values(ascending=False)
+    df.groupby("company")["source_document"].nunique().sort_values(ascending=False)
 )
 
 print("\nUnique source documents per company")
@@ -57,11 +51,8 @@ print(docs_per_company)
 
 summary = (
     df.groupby("company")
-      .agg(
-          questions=("question_id", "count"),
-          documents=("source_document", "nunique")
-      )
-      .sort_values("questions", ascending=False)
+    .agg(questions=("question_id", "count"), documents=("source_document", "nunique"))
+    .sort_values("questions", ascending=False)
 )
 
 print("\nCompany summary")

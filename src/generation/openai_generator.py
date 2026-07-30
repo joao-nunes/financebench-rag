@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class OpenAIGenerator(Generator):
 
     def __init__(
@@ -32,4 +33,3 @@ class OpenAIGenerator(Generator):
             return response.output_text
         except Exception as e:
             raise GenerationError("Failed to generate response.") from e
-        

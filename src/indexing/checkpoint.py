@@ -8,7 +8,6 @@ from src.indexing.faiss_store import FAISSStore
 from src.utils.logger import get_logger
 from src.indexing.metadata import CheckpointMetadata
 
-
 logger = get_logger(__name__)
 
 
@@ -23,33 +22,27 @@ class CheckpointManager:
 
         self.faiss_dir = self.checkpoint_dir / "faiss"
 
-        self.metadata_file = (
-            self.checkpoint_dir / "metadata.json"
-        )
+        self.metadata_file = self.checkpoint_dir / "metadata.json"
 
         self.checkpoint_dir.mkdir(
             parents=True,
             exist_ok=True,
         )
-    
+
     def save(
         self,
         store: FAISSStore,
         metadata: CheckpointMetadata,
     ) -> None:
 
-        logger.info(
-            "Saving checkpoint..."
-        )
+        logger.info("Saving checkpoint...")
 
         self.faiss_dir.mkdir(
             parents=True,
             exist_ok=True,
         )
 
-        store.save(
-            self.faiss_dir
-        )
+        store.save(self.faiss_dir)
 
         with open(
             self.metadata_file,
@@ -63,9 +56,7 @@ class CheckpointManager:
                 indent=4,
             )
 
-        logger.info(
-            "Checkpoint saved."
-        )
+        logger.info("Checkpoint saved.")
 
     def load_metadata(
         self,
@@ -83,7 +74,7 @@ class CheckpointManager:
             data = json.load(f)
 
         return CheckpointMetadata(**data)
-    
+
     def load_store(
         self,
         store: FAISSStore,
@@ -96,25 +87,19 @@ class CheckpointManager:
         )
 
         return store
-    
+
     def exists(self) -> bool:
 
         return (
             self.metadata_file.exists()
-            and
-            (self.faiss_dir / "index.faiss").exists()
-            and
-            (self.faiss_dir / "index.pkl").exists()
+            and (self.faiss_dir / "index.faiss").exists()
+            and (self.faiss_dir / "index.pkl").exists()
         )
-    
+
     def clear(self):
 
         if self.checkpoint_dir.exists():
 
-            shutil.rmtree(
-                self.checkpoint_dir
-            )
+            shutil.rmtree(self.checkpoint_dir)
 
-            logger.info(
-                "Checkpoint removed."
-            )
+            logger.info("Checkpoint removed.")

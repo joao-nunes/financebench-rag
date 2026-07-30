@@ -9,11 +9,11 @@ import pytest
 
 
 class FakeRetriever(Retriever):
-    
+
     def __init__(self):
         self.received_query = None
 
-    def retrieve(self, query: str)-> list[RetrievalResult]:
+    def retrieve(self, query: str) -> list[RetrievalResult]:
         self.received_query = query
         return [
             RetrievalResult(
@@ -35,14 +35,13 @@ class FailingRetriever(Retriever):
 
     def retrieve(self, query: str) -> list[RetrievalResult]:
         raise RetrievalError("Failed to retrieve relevant chunks.")
-    
+
 
 class FakeReranker(Reranker):
-    
+
     def __init__(self):
         self.received_query = None
         self.received_chunks = None
-    
 
     def rerank(
         self,
@@ -56,8 +55,11 @@ class FakeReranker(Reranker):
 
 class FailingReranker(Reranker):
 
-    def rerank(self, query: str, chunks: list[RetrievalResult]) -> list[RetrievalResult]:
-        raise RerankingError("Failed to rerank relevant chunks.")    
+    def rerank(
+        self, query: str, chunks: list[RetrievalResult]
+    ) -> list[RetrievalResult]:
+        raise RerankingError("Failed to rerank relevant chunks.")
+
 
 class FakePromptBuilder(PromptBuilder):
 
@@ -70,10 +72,12 @@ class FakePromptBuilder(PromptBuilder):
         self.received_context = context
         return "PROMPT"
 
+
 class FailingPromptBuilder(PromptBuilder):
 
     def build(self, question, context):
         raise PromptBuildError("Failed to build prompt.")
+
 
 class FakeGenerator(Generator):
 
@@ -83,7 +87,7 @@ class FakeGenerator(Generator):
     def generate(self, prompt: str) -> str:
         self.received_prompt = prompt
         return "Generated answer"
-    
+
 
 def test_pipeline_returns_generator_answer():
     fake_retriever = FakeRetriever()
@@ -130,7 +134,6 @@ def test_pipeline_raises_retrieval_error():
         generator=fake_generator,
     )
 
-
     with pytest.raises(RetrievalError):
         pipeline.answer("What is FinanceBench?")
 
@@ -147,7 +150,6 @@ def test_pipeline_raises_reranking_error():
         prompt_builder=fake_prompt_builder,
         generator=fake_generator,
     )
-
 
     with pytest.raises(RerankingError):
         pipeline.answer("What is FinanceBench?")

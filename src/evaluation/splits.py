@@ -60,21 +60,21 @@ class Split:
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        pd.DataFrame(
-            {"question_id": self.train_ids}
-        ).to_csv(directory / "train.csv", index=False)
+        pd.DataFrame({"question_id": self.train_ids}).to_csv(
+            directory / "train.csv", index=False
+        )
 
-        pd.DataFrame(
-            {"question_id": self.validation_ids}
-        ).to_csv(directory / "validation.csv", index=False)
+        pd.DataFrame({"question_id": self.validation_ids}).to_csv(
+            directory / "validation.csv", index=False
+        )
 
-        pd.DataFrame(
-            {"question_id": self.test_ids}
-        ).to_csv(directory / "test.csv", index=False)
+        pd.DataFrame({"question_id": self.test_ids}).to_csv(
+            directory / "test.csv", index=False
+        )
 
         with (directory / "split_info.json").open("w") as f:
             json.dump(self.metadata, f, indent=4)
-    
+
     @property
     def development_ids(self) -> list[int]:
         return self.train_ids + self.validation_ids

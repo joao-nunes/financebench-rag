@@ -1,5 +1,5 @@
 from src.exceptions import RerankingError
-from src.retrieval.reranker import Reranker  
+from src.retrieval.reranker import Reranker
 from src.retrieval.models import RetrievalResult
 from sentence_transformers import CrossEncoder
 
@@ -68,7 +68,7 @@ class CrossEncoderReranker(Reranker):
                 )
 
             return reranked
-        
+
         except Exception as e:
             logger.debug(
                 "CrossEncoder reranking failed for %d chunks.",

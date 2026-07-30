@@ -14,12 +14,12 @@ from src.indexing.embeddings import get_embedding_model
 from src.logging_config import configure_logging
 from src.config import VECTORSTORE_DIR
 
+
 @asynccontextmanager
 async def lifespan(app):
-    
+
     configure_logging()
 
-   
     embedding_model = get_embedding_model()
 
     vectorstore = FAISSStore()
@@ -34,13 +34,12 @@ async def lifespan(app):
     prompt_builder = SimplePromptBuilder()
     generator = OpenAIGenerator()
 
-    
     pipeline = RAGPipeline(
-    retriever=retriever,
-    reranker=reranker,
-    prompt_builder=prompt_builder,
-    generator=generator,
-)
+        retriever=retriever,
+        reranker=reranker,
+        prompt_builder=prompt_builder,
+        generator=generator,
+    )
 
     dependencies.rag_service = RAGService(pipeline)
 

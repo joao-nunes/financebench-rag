@@ -36,17 +36,15 @@ def main():
     prompt = get_rag_prompt()
     print("✓ Prompt created")
 
-    
     llm = get_llm()
     print("✓ LLM created")
 
-
     print("Creating RAG chain...")
     pipeline = LangChainRAGPipeline(
-    retriever=retriever,
-    prompt=prompt,
-    llm=llm,
-)
+        retriever=retriever,
+        prompt=prompt,
+        llm=llm,
+    )
 
     print("=" * 60)
     print("FinanceBench RAG")
@@ -59,15 +57,13 @@ def main():
         if question.lower() == "exit":
             break
 
-        
-
         print("\nThinking...\n")
 
         result = pipeline.invoke(question)
         answer = result.prediction
 
         docs = retriever.invoke(question)
-        
+
         print(f"Retrieved {len(docs)} documents\n")
 
         for i, doc in enumerate(docs):

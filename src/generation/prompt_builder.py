@@ -14,6 +14,3 @@ class PromptBuilder(ABC):
     ) -> str:
         """Build a prompt for the language model."""
         pass
-
-
-

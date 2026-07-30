@@ -7,16 +7,14 @@ import pandas as pd
 
 from abc import ABC, abstractmethod
 
+
 class EvaluationDataset(ABC):
 
     @abstractmethod
-    def __iter__(self):
-        ...
+    def __iter__(self): ...
 
     @abstractmethod
-    def __len__(self):
-        ...
-
+    def __len__(self): ...
 
 
 import re
@@ -56,7 +54,7 @@ def parse_document_name(doc_name: str):
     filing_type = filing_match.group(1) if filing_match else None
 
     # Company = everything before the year
-    company = stem[:year_match.start()].rstrip("_")
+    company = stem[: year_match.start()].rstrip("_")
 
     return company, year, filing_type
 
@@ -68,8 +66,6 @@ class FinanceBenchDataset(EvaluationDataset):
         samples: list[EvaluationSample],
     ):
         self._samples = samples
-
-
 
     @classmethod
     def from_jsonl(
@@ -116,9 +112,7 @@ class FinanceBenchDataset(EvaluationDataset):
 
         for sample in self:
 
-            company, year, filing_type = parse_document_name(
-                sample.source_document
-            )
+            company, year, filing_type = parse_document_name(sample.source_document)
 
             rows.append(
                 {
@@ -142,7 +136,6 @@ class FinanceBenchDataset(EvaluationDataset):
         df = self.to_dataframe()
         df.to_csv(path, index=False)
 
-    
     def subset(
         self,
         question_ids: list[str],
@@ -150,11 +143,6 @@ class FinanceBenchDataset(EvaluationDataset):
 
         ids = set(question_ids)
 
-        samples = [
-            sample
-            for sample in self
-            if sample.metadata["id"] in ids
-        ]
+        samples = [sample for sample in self if sample.metadata["id"] in ids]
 
         return FinanceBenchDataset(samples)
-    

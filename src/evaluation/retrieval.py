@@ -12,6 +12,7 @@ from .metrics import (
     reciprocal_rank,
 )
 
+
 @dataclass(slots=True)
 class RetrievalMetrics:
     unbounded_recall: float
@@ -39,41 +40,34 @@ class RetrievalEvaluator(BaseEvaluator):
         retrieved = self._aggregate_chunks(result.retrieved_chunks)
         reranked = self._aggregate_chunks(result.reranked_chunks)
         return RetrievalMetrics(
-
             unbounded_recall=unbounded_recall(
                 relevant,
                 retrieved,
             ),
-
             recall_at_1=recall_at_k(
                 relevant,
                 reranked,
                 1,
             ),
-
             recall_at_5=recall_at_k(
                 relevant,
                 reranked,
                 5,
             ),
-
             recall_at_10=recall_at_k(
                 relevant,
                 reranked,
                 10,
             ),
-
             precision_at_5=precision_at_k(
                 relevant,
                 reranked,
                 5,
             ),
-
             mrr=reciprocal_rank(
                 relevant,
                 reranked,
             ),
-
             ndcg_at_5=ndcg_at_k(
                 relevant,
                 reranked,

@@ -27,13 +27,10 @@ def format_context(chunks: list[RetrievedChunk]) -> str:
     str
         Concatenated document contents.
     """
-    
+
     MAX_CONTEXT_CHARS = 5000
 
-    context = "\n\n".join(
-        chunk.page_content
-        for chunk in chunks
-    )
+    context = "\n\n".join(chunk.page_content for chunk in chunks)
 
     context = context[:MAX_CONTEXT_CHARS]
 
@@ -45,17 +42,13 @@ def create_generation_chain(
     llm: BaseChatModel,
 ):
 
-
     generation_chain = (
         {
             "question": RunnableLambda(lambda x: x["question"]),
-            "context": RunnableLambda(
-                lambda x: format_context(x["context"])
-            ),
+            "context": RunnableLambda(lambda x: format_context(x["context"])),
         }
         | prompt
         | llm
         | StrOutputParser()
     )
     return generation_chain
-

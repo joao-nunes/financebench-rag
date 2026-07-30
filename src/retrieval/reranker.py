@@ -13,7 +13,4 @@ class Reranker(ABC):
         self,
         query: str,
         documents: list[RetrievalResult],
-    ) -> list[RetrievalResult]:
-        ...
-
-
+    ) -> list[RetrievalResult]: ...

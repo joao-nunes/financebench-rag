@@ -18,14 +18,14 @@ from src.evaluation.models import (
     EvaluationSample,
 )
 
+
 class GenerationMetric(ABC):
     @abstractmethod
     def compute(
         self,
         sample: EvaluationSample,
         result: EvaluationResult,
-    ) -> float:
-        ...
+    ) -> float: ...
 
 
 def unbounded_recall(relevant: set[str], retrieved: list[str]) -> float:
@@ -100,26 +100,17 @@ def ndcg_at_k(
     if ideal == 0:
         return 0.0
 
-    idcg = sum(
-        1 / math.log2(i + 2)
-        for i in range(ideal)
-    )
+    idcg = sum(1 / math.log2(i + 2) for i in range(ideal))
 
     return dcg / idcg
 
 
 class GenerationScores(BaseModel):
-    context_recall: float = Field(
-        description="Score between 0 and 1."
-    )
+    context_recall: float = Field(description="Score between 0 and 1.")
 
-    faithfulness: float = Field(
-        description="Score between 0 and 1."
-    )
+    faithfulness: float = Field(description="Score between 0 and 1.")
 
-    answer_correctness: float = Field(
-        description="Score between 0 and 1."
-    )
+    answer_correctness: float = Field(description="Score between 0 and 1.")
 
 
 class AggregatedGenerationMetrics(GenerationMetric):
@@ -175,14 +166,9 @@ Generated Answer:
             ]
         )
 
-        structured_llm = llm.with_structured_output(
-            GenerationScores
-        )
+        structured_llm = llm.with_structured_output(GenerationScores)
 
-        self._chain = (
-            prompt
-            | structured_llm
-        )
+        self._chain = prompt | structured_llm
 
     def compute(
         self,
@@ -190,10 +176,7 @@ Generated Answer:
         result: EvaluationResult,
     ) -> float:
 
-        context = "\n\n".join(
-            chunk.page_content
-            for chunk in result.reranked_chunks
-        )
+        context = "\n\n".join(chunk.page_content for chunk in result.reranked_chunks)
 
         scores = self._chain.invoke(
             {

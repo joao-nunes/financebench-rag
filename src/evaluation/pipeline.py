@@ -12,6 +12,7 @@ from src.evaluation.models import (
     RetrievedChunk,
 )
 
+
 class RAGPipeline(Protocol):
     """
     Interface for any Retrieval-Augmented Generation pipeline.
@@ -39,7 +40,6 @@ class RAGPipeline(Protocol):
         ...
 
 
-
 class FinanceBenchRAGPipeline:
     """
     Concrete implementation of a RAG pipeline.
@@ -63,15 +63,15 @@ class FinanceBenchRAGPipeline:
         start = time.perf_counter()
 
         retrieved_chunks = self.retriever.invoke(question)
-        
+
         retrieved_chunks = [
-                RetrievedChunk(
-                    document_id=doc.metadata["document_id"],
-                    page_content=doc.page_content,
-                    score=doc.metadata.get("score"),
-                    metadata=doc.metadata,
-                )
-                for doc in retrieved_chunks
+            RetrievedChunk(
+                document_id=doc.metadata["document_id"],
+                page_content=doc.page_content,
+                score=doc.metadata.get("score"),
+                metadata=doc.metadata,
+            )
+            for doc in retrieved_chunks
         ]
 
         reranked_chunks = self.reranker.rerank(question, retrieved_chunks)
@@ -80,11 +80,11 @@ class FinanceBenchRAGPipeline:
             RetrievedChunk(
                 document_id=doc.metadata["document_id"],
                 page_content=doc.page_content,
-                score=doc.score,      # or doc.metadata["score"], depending on your reranker
+                score=doc.score,  # or doc.metadata["score"], depending on your reranker
                 metadata=doc.metadata,
             )
             for doc in reranked_chunks
-            ]
+        ]
 
         latency_ms = (time.perf_counter() - start) * 1000
 
@@ -103,7 +103,7 @@ class FinanceBenchRAGPipeline:
             reranked_chunks=reranked_chunks,
             latency_ms=latency_ms,
         )
-    
+
 
 class RetrievalPipeline(RAGPipeline):
     """
@@ -124,15 +124,15 @@ class RetrievalPipeline(RAGPipeline):
         start = time.perf_counter()
 
         retrieved_chunks = self.retriever.invoke(question)
-        
+
         retrieved_chunks = [
-                RetrievedChunk(
-                    document_id=doc.metadata["document_id"],
-                    page_content=doc.page_content,
-                    score=doc.metadata.get("score"),
-                    metadata=doc.metadata,
-                )
-                for doc in retrieved_chunks
+            RetrievedChunk(
+                document_id=doc.metadata["document_id"],
+                page_content=doc.page_content,
+                score=doc.metadata.get("score"),
+                metadata=doc.metadata,
+            )
+            for doc in retrieved_chunks
         ]
 
         reranked_chunks = self.reranker.rerank(question, retrieved_chunks)
@@ -141,18 +141,17 @@ class RetrievalPipeline(RAGPipeline):
             RetrievedChunk(
                 document_id=doc.metadata["document_id"],
                 page_content=doc.page_content,
-                score=doc.score,      # or doc.metadata["score"], depending on your reranker
+                score=doc.score,  # or doc.metadata["score"], depending on your reranker
                 metadata=doc.metadata,
             )
             for doc in reranked_chunks
-            ]
+        ]
 
         latency_ms = (time.perf_counter() - start) * 1000
 
-
         return EvaluationResult(
             question=question,
-            prediction="",          # No generation
+            prediction="",  # No generation
             retrieved_chunks=retrieved_chunks,
             reranked_chunks=reranked_chunks,
             latency_ms=latency_ms,

@@ -12,6 +12,7 @@ from pathlib import Path
 
 from dataclasses import asdict
 
+
 class BenchmarkRunner:
 
     def __init__(
@@ -28,7 +29,6 @@ class BenchmarkRunner:
     ) -> list[BenchmarkResult]:
 
         return list(self.run(dataset))
-    
 
     def run(
         self,
@@ -41,9 +41,7 @@ class BenchmarkRunner:
             desc="Running benchmark",
         ):
 
-            pipeline_result = self._rag_pipeline.invoke(
-                sample.question
-            )
+            pipeline_result = self._rag_pipeline.invoke(sample.question)
 
             metrics = self._evaluator.evaluate(
                 sample,
@@ -55,6 +53,7 @@ class BenchmarkRunner:
                 result=pipeline_result,
                 metrics=metrics,
             )
+
 
 class BenchmarkWriter:
     """

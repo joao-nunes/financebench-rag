@@ -13,7 +13,6 @@ from retrieval.faiss_retriever import create_retriever
 from src.evaluation.splits import Split
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 
-
 EXPERIMENT_NAME = "baseline"
 RERANKER_MODEL = "BAAI/bge-reranker-base"
 RERANKER_TOP_K = 5
@@ -26,9 +25,7 @@ from pathlib import Path
 
 VECTORSTORE_PATH = Path("./data/vectorstore")
 
-DATASET_PATH = Path(
-    "./data/financebench/data/financebench_open_source.jsonl"
-)
+DATASET_PATH = Path("./data/financebench/data/financebench_open_source.jsonl")
 
 embedding_model = get_embedding_model()
 
@@ -77,24 +74,14 @@ for benchmark_result in results[:5]:
         benchmark_result.result.reranked_chunks,
         start=1,
     ):
-        print(
-            f"{rank:>2}. "
-            f"{chunk.metadata['document_id']}"
-        )
+        print(f"{rank:>2}. " f"{chunk.metadata['document_id']}")
 
-metrics = pd.DataFrame(
-    [
-        r.metrics.to_dict()
-        for r in results
-    ]
-)
+metrics = pd.DataFrame([r.metrics.to_dict() for r in results])
 writer = ExperimentWriter(experiment_dir)
 
-writer.save_benchmark_results(
-    results)
+writer.save_benchmark_results(results)
 
-writer.save_retrieval_failures(
-    results)
+writer.save_retrieval_failures(results)
 
 
 writer.save_environment()
