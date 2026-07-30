@@ -135,41 +135,77 @@ conda create -n financebench-rag python=3.11
 conda activate financebench-rag
 ```
 
-### Install the project
+## Quick Start
 
-Project dependencies are managed through **`pyproject.toml`**.
+### 1. Clone the repository
 
-Install the project and its runtime dependencies:
+```bash
+git clone https://github.com/<your-username>/financebench-rag.git
+cd financebench-rag
+```
+
+### 2. Create an environment
+
+**Virtual environment (recommended)**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+**Conda (optional)**
+
+```bash
+conda create -n financebench-rag python=3.11
+conda activate financebench-rag
+```
+
+### 3. Install the project
 
 ```bash
 pip install .
 ```
 
-For development (tests, linting, formatting, coverage, etc.):
+For development:
 
 ```bash
 pip install ".[dev]"
 ```
 
-### Configure environment variables
+### 4. Configure environment variables
 
-Create a `.env` file (or copy `.env.example`):
+Copy `.env.example` to `.env` and set your OpenAI API key.
 
 ```text
 OPENAI_API_KEY=your_openai_api_key
-EMBEDDING_DEVICE=cpu
 ```
 
-### Run the API
+### 5. Download the FinanceBench dataset
+
+```bash
+python scripts/download_financebench.py
+```
+
+This downloads the FinanceBench documents and stores them in the `data/` directory.
+
+### 6. Build the vector store
+
+```bash
+python scripts/build_vectorstore.py
+```
+
+This generates the FAISS vector index used for semantic retrieval.
+
+### 7. Launch the API
 
 ```bash
 uvicorn api.main:app --reload
 ```
 
-The API will be available at:
+Visit:
 
-- http://localhost:8000
 - http://localhost:8000/docs
+- http://localhost:8000/redoc
 
 ## Example Request
 
