@@ -163,7 +163,7 @@ EMBEDDING_DEVICE=cpu
 ### Run the API
 
 ```bash
-uvicorn api.main:app --reload
+uvicorn api.app:app --reload
 ```
 
 The API will be available at:
