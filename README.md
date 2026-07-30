@@ -1,6 +1,6 @@
 # FinanceBench RAG
 
-![CI](https://github.com/<username>/financebench-rag/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/joao-nunes/financebench-rag/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
