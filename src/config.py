@@ -13,7 +13,7 @@ FINANCEBENCH_DIR = DATA_DIR / "financebench"
 
 PDF_DIR = FINANCEBENCH_DIR / "pdfs"
 
-VECTORSTORE_DIR = DATA_DIR / "vectorstore"
+VECTORSTORE_DIR = DATA_DIR / "full/vectorstore"
 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 EMBEDDING_BATCH_SIZE = 64
@@ -43,3 +43,22 @@ CHUNKS_CACHE = CACHE_DIR / "chunks.pkl"
 INDEX_BATCH_SIZE = 512
 
 CHECKPOINT_DIR = DATA_DIR / "checkpoints" / "financebench"
+
+SOURCE = ROOT_DIR / "data" / "financebench"
+DESTINATION = ROOT_DIR / "data" / "sample"
+
+QUESTIONS_FILE = SOURCE / "data/financebench_open_source.jsonl"
+DOCUMENT_INFO_FILE = SOURCE / "data/financebench_document_information.jsonl"
+SOURCE_DOCUMENTS = SOURCE / "documents"
+DESTINATION_DOCUMENTS = DESTINATION / "documents"
+
+# Companies to keep
+SAMPLE_COMPANIES = {
+    "Apple",
+    "Microsoft",
+    "Amazon",
+    "NVIDIA",
+    "Tesla",
+}
+
+# ---------------------------------------------------------------------

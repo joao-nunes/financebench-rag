@@ -1,13 +1,33 @@
+#!/usr/bin/env python
+"""
+Build a FAISS vector store from a collection of PDF documents.
+
+Examples
+--------
+# Full FinanceBench
+python scripts/build_vectorstore.py \
+    --input data/financebench \
+    --output vectorstore/full
+
+# Sample dataset
+python scripts/build_vectorstore.py \
+    --input data/sample \
+    --output vectorstore/sample
+
+# Force rebuilding cached artifacts
+python scripts/build_vectorstore.py \
+    --input data/sample \
+    --output vectorstore/sample \
+    --rebuild
+"""
+
+from __future__ import annotations
+
 import argparse
+import shutil
 import time
 from pathlib import Path
 
-from src.config import (
-    CHUNKS_CACHE,
-    DOCUMENTS_CACHE,
-    PDF_DIR,
-    VECTORSTORE_DIR,
-)
 from src.indexing.embedding_engine import EmbeddingEngine
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
@@ -22,66 +42,122 @@ from src.utils.cache import (
 )
 
 
-def main():
+def parse_args():
+    parser = argparse.ArgumentParser(description="Build a FAISS vector store.")
 
-    parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--rebuild", action="store_true", help="Ignore cache and rebuild all artifacts."
+        "--input",
+        type=Path,
+        required=True,
+        help="Dataset directory (e.g. data/sample or data/financebench).",
     )
 
-    args = parser.parse_args()
-    pdf_dir = Path(PDF_DIR)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Directory where the FAISS index will be written.",
+    )
 
-    pdf_files = sorted(pdf_dir.glob("*.pdf"))
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Ignore cached artifacts.",
+    )
 
-    if len(pdf_files) == 0:
-        raise RuntimeError(f"No PDFs found in {pdf_dir}")
+    return parser.parse_args()
+
+
+def load_documents(pdf_files):
+    documents = []
+    failed = []
+
+    start = time.perf_counter()
+
+    for pdf in pdf_files:
+        print(f"Loading {pdf.name}")
+
+        try:
+            documents.extend(load_pdf(pdf))
+        except Exception as e:
+            print(f"❌ {pdf.name}")
+            print(f"   {e}")
+            failed.append(pdf.name)
+
+    elapsed = time.perf_counter() - start
+
+    print(f"\nLoaded {len(documents):,} pages in {elapsed:.1f}s")
+
+    if failed:
+        print(f"Skipped {len(failed)} PDFs")
+
+    return documents
+
+
+def main():
+
+    args = parse_args()
+
+    documents_dir = args.input / "pdfs"
+
+    if not documents_dir.exists():
+        raise FileNotFoundError(f"Documents directory not found: {documents_dir}")
+
+    pdf_files = sorted(documents_dir.glob("*.pdf"))
+
+    if not pdf_files:
+        raise RuntimeError(f"No PDFs found in {documents_dir}")
+
+    cache_dir = args.output / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    documents_cache = cache_dir / "documents.pkl"
+    chunks_cache = cache_dir / "chunks.pkl"
 
     print("=" * 80)
-    print(f"Found {len(pdf_files)} PDFs")
+    print(f"Dataset : {args.input}")
+    print(f"PDFs    : {len(pdf_files)}")
     print("=" * 80)
 
-    if cache_exists(DOCUMENTS_CACHE) and not args.rebuild:
+    # ------------------------------------------------------------------
+    # Documents
+    # ------------------------------------------------------------------
+
+    if cache_exists(documents_cache) and not args.rebuild:
+
         print("Loading cached documents...")
-        documents = load_cache(DOCUMENTS_CACHE)
+        documents = load_cache(documents_cache)
+
     else:
-        documents = []
-        failed_pdfs = []
-        start = time.perf_counter()
-        for pdf in pdf_files:
-            print(f"Loading {pdf.name}")
 
-            try:
-                docs = load_pdf(pdf)
-                documents.extend(docs)
-            except Exception as e:
-                print(f"❌ Failed: {pdf.name}")
-                print(f"   {e}")
-                failed_pdfs.append((pdf.name, str(e)))
+        documents = load_documents(pdf_files)
+        save_cache(documents, documents_cache)
 
-        elapsed = time.perf_counter() - start
-        print(f"Loaded {len(documents):,} pages in {elapsed:.1f}s")
-        print(f"Skipped {len(failed_pdfs)} PDFs")
+    # ------------------------------------------------------------------
+    # Chunks
+    # ------------------------------------------------------------------
 
-        if failed_pdfs:
-            print("\nFailed PDFs:")
-            for name, err in failed_pdfs:
-                print(f" - {name}: {err}")
+    if cache_exists(chunks_cache) and not args.rebuild:
 
-        save_cache(documents, DOCUMENTS_CACHE)
-
-    if cache_exists(CHUNKS_CACHE) and not args.rebuild:
         print("Loading cached chunks...")
-        chunks = load_cache(CHUNKS_CACHE)
-    else:
-        start = time.perf_counter()
-        chunks = split_documents(documents)
+        chunks = load_cache(chunks_cache)
 
+    else:
+
+        start = time.perf_counter()
+
+        chunks = split_documents(documents)
         chunks = [enrich_chunk(chunk) for chunk in chunks]
 
         elapsed = time.perf_counter() - start
-        print(f"Generated {len(chunks)} chunks in {elapsed:.1f}s")
-        save_cache(chunks, CHUNKS_CACHE)
+
+        print(f"Generated {len(chunks):,} chunks in {elapsed:.1f}s")
+
+        save_cache(chunks, chunks_cache)
+
+    # ------------------------------------------------------------------
+    # Embeddings
+    # ------------------------------------------------------------------
 
     embedding_model = get_embedding_model()
 
@@ -96,9 +172,29 @@ def main():
         embedding_engine=embedding_engine,
         vector_store=vector_store,
     )
+
+    print("\nBuilding vector store...")
+    start = time.perf_counter()
+
     indexer.build(chunks)
 
-    vector_store.save(VECTORSTORE_DIR)
+    elapsed = time.perf_counter() - start
+
+    # ------------------------------------------------------------------
+    # Save
+    # ------------------------------------------------------------------
+
+    if args.output.exists():
+        shutil.rmtree(args.output)
+
+    args.output.mkdir(parents=True, exist_ok=True)
+
+    vector_store.save(args.output)
+
+    print("\nDone!")
+    print(f"Chunks       : {len(chunks):,}")
+    print(f"Output       : {args.output}")
+    print(f"Elapsed time : {elapsed:.1f}s")
 
 
 if __name__ == "__main__":
