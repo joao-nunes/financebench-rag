@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from typing import Protocol
-
-from .models import EvaluationResult
-
 import time
+from typing import Protocol
 
 from src.evaluation.models import (
     EvaluationResult,
-    RetrievedDocument,
     RetrievedChunk,
 )
 

@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-import uuid
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 import faiss
 import numpy as np
-
-from langchain_core.documents import Document
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 
 from src.utils.logger import get_logger
 
@@ -64,7 +62,8 @@ class FAISSStore:
             raise RuntimeError("Index has not been initialized.")
 
         text_embeddings = [
-            (doc.page_content, emb) for doc, emb in zip(documents, embeddings)
+            (doc.page_content, emb) for doc, emb in 
+            zip(documents, embeddings, strict=True)
         ]
 
         embeddings = np.asarray(embeddings, dtype=np.float32)

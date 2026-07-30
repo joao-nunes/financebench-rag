@@ -1,10 +1,9 @@
 from langchain_openai import ChatOpenAI
 
-
 from src.config import (
+    MAX_TOKENS,
     OPENAI_MODEL,
     TEMPERATURE,
-    MAX_TOKENS,
 )
 
 

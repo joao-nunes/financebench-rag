@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from src.generation.templates import RAG_PROMPT
 from src.retrieval.models import RetrievalResult
 
 

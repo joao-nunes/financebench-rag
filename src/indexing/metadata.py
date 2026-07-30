@@ -28,7 +28,7 @@ class CheckpointMetadata:
         total_documents: int,
         batch_size: int,
         embedding_model: str,
-    ) -> "CheckpointMetadata":
+    ) -> CheckpointMetadata:
 
         return cls(
             current_batch=current_batch,

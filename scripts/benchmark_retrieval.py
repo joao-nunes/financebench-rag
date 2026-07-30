@@ -2,15 +2,15 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.evaluation.writer import ExperimentWriter
+from retrieval.faiss_retriever import create_retriever
 from src.evaluation.benchmark import BenchmarkRunner
 from src.evaluation.dataset import FinanceBenchDataset
 from src.evaluation.pipeline import RetrievalPipeline
 from src.evaluation.retrieval import RetrievalEvaluator
+from src.evaluation.splits import Split
+from src.evaluation.writer import ExperimentWriter
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
-from retrieval.faiss_retriever import create_retriever
-from src.evaluation.splits import Split
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 
 EXPERIMENT_NAME = "baseline"
@@ -21,7 +21,6 @@ SEED = 42
 
 experiment_dir = Path("experiments/baseline")
 
-from pathlib import Path
 
 VECTORSTORE_PATH = Path("./data/vectorstore")
 

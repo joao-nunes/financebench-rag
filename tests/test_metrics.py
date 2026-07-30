@@ -2,10 +2,10 @@ import pytest
 
 from src.evaluation.metrics import (
     hit_rate,
-    recall_at_k,
-    precision_at_k,
-    reciprocal_rank,
     ndcg_at_k,
+    precision_at_k,
+    recall_at_k,
+    reciprocal_rank,
 )
 
 

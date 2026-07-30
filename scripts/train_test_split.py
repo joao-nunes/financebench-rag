@@ -1,6 +1,8 @@
-from sklearn.model_selection import train_test_split
-import pandas as pd
+import json
 from pathlib import Path
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 # Load the benchmark
 df = pd.read_csv("data/financebench/benchmark.csv")
@@ -39,8 +41,6 @@ test_df[["question_id"]].to_csv(
     split_dir / "test.csv",
     index=False,
 )
-
-import json
 
 split_info = {
     "random_seed": 42,

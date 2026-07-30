@@ -2,8 +2,8 @@ from pprint import pprint
 
 from src.evaluation.dataset import FinanceBenchDataset
 from src.evaluation.models import (
-    RetrievedDocument,
     EvaluationResult,
+    RetrievedDocument,
 )
 from src.evaluation.retrieval import RetrievalEvaluator
 

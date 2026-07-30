@@ -1,3 +1,5 @@
+import argparse
+import time
 from pathlib import Path
 
 from src.config import (
@@ -5,28 +7,19 @@ from src.config import (
     DOCUMENTS_CACHE,
     PDF_DIR,
     VECTORSTORE_DIR,
-    CHECKPOINT_DIR,
 )
-
-from src.ingestion.loaders import load_pdf
-from src.ingestion.splitter import split_documents
-
-from src.indexing.embeddings import get_embedding_model
 from src.indexing.embedding_engine import EmbeddingEngine
+from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
 from src.indexing.indexer import FAISSIndexer
-from src.indexing.checkpoint import CheckpointManager
 from src.ingestion.helpers import enrich_chunk
-
-
+from src.ingestion.loaders import load_pdf
+from src.ingestion.splitter import split_documents
 from src.utils.cache import (
     cache_exists,
     load_cache,
     save_cache,
 )
-
-import argparse
-import time
 
 
 def main():
@@ -98,10 +91,6 @@ def main():
     )
 
     vector_store = FAISSStore()
-
-    checkpoint_manager = CheckpointManager(
-        checkpoint_dir=CHECKPOINT_DIR,
-    )
 
     indexer = FAISSIndexer(
         embedding_engine=embedding_engine,

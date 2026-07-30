@@ -1,5 +1,5 @@
-from src.retrieval.reranker import Reranker
 from src.retrieval.models import RetrievalResult
+from src.retrieval.reranker import Reranker
 
 
 class NoOpReranker(Reranker):

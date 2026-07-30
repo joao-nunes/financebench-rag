@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 import math
-import json
-from pathlib import Path
-
-from pydantic import BaseModel, Field
+from abc import ABC, abstractmethod
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
 
-
-from src.chains import llm
 from src.evaluation.models import (
     EvaluationResult,
     EvaluationSample,
@@ -144,15 +138,18 @@ Evaluate the system using the following three metrics.
 
 1. Context Recall
 
-Determine whether the retrieved context contains enough information to answer the question correctly.
+Determine whether the retrieved context contains enough information 
+to answer the question correctly.
 
 2. Faithfulness
 
-Determine whether every factual statement in the generated answer is supported by the retrieved context.
+Determine whether every factual statement in the generated 
+answer is supported by the retrieved context.
 
 3. Answer Correctness
 
-Determine whether the generated answer correctly answers the question compared to the reference answer.
+Determine whether the generated answer correctly answers 
+the question compared to the reference answer.
 
 Each score must be between 0 and 1.
 

@@ -1,11 +1,12 @@
-from src.pipeline.rag_pipeline import RAGPipeline
+import pytest
+
+from src.exceptions import PromptBuildError, RerankingError, RetrievalError
+from src.generation.generator import Generator
 from src.generation.prompt_builder import PromptBuilder
-from src.retrieval.retriever import Retriever
+from src.pipeline.rag_pipeline import RAGPipeline
 from src.retrieval.models import RetrievalResult
 from src.retrieval.reranker import Reranker
-from src.generation.generator import Generator
-from src.exceptions import PromptBuildError, RerankingError, RetrievalError
-import pytest
+from src.retrieval.retriever import Retriever
 
 
 class FakeRetriever(Retriever):

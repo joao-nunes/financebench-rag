@@ -1,13 +1,13 @@
+import logging
+
+from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStoreRetriever
-from langchain_community.vectorstores import FAISS
 
 from src.config import TOP_K
+from src.exceptions import RetrievalError
 from src.retrieval.models import RetrievalResult
 from src.retrieval.retriever import Retriever
-from src.exceptions import RetrievalError
-
-import logging
 
 logger = logging.getLogger(__name__)
 

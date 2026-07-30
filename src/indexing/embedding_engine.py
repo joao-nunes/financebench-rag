@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Iterator, Sequence
+from collections.abc import Iterator, Sequence
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings

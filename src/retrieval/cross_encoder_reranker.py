@@ -1,10 +1,9 @@
-from src.exceptions import RerankingError
-from src.retrieval.reranker import Reranker
-from src.retrieval.models import RetrievalResult
 from sentence_transformers import CrossEncoder
 
-
+from src.exceptions import RerankingError
 from src.logging_config import logging
+from src.retrieval.models import RetrievalResult
+from src.retrieval.reranker import Reranker
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +46,7 @@ class CrossEncoderReranker(Reranker):
             )
 
             ranked = sorted(
-                zip(chunks, scores),
+                zip(chunks, scores, strict=True),
                 key=lambda x: x[1],
                 reverse=True,
             )

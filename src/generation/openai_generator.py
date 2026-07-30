@@ -1,12 +1,10 @@
-from openai import OpenAI
-
-from src.generation.generator import Generator
-from src.exceptions import GenerationError
-
-import os
-from openai import OpenAI
-
 import logging
+import os
+
+from openai import OpenAI
+
+from src.exceptions import GenerationError
+from src.generation.generator import Generator
 
 logger = logging.getLogger(__name__)
 

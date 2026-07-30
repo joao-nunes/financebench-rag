@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from src.evaluation.dataset import EvaluationDataset
-from src.evaluation.models import BenchmarkResult
-from src.evaluation.pipeline import RAGPipeline
-from src.evaluation.models import BaseEvaluator
-from collections.abc import Iterator
-from tqdm.auto import tqdm
-
 import json
+from collections.abc import Iterator
+from dataclasses import asdict
 from pathlib import Path
 
-from dataclasses import asdict
+from tqdm.auto import tqdm
+
+from src.evaluation.dataset import EvaluationDataset
+from src.evaluation.models import BaseEvaluator, BenchmarkResult
+from src.evaluation.pipeline import RAGPipeline
 
 
 class BenchmarkRunner:
@@ -67,7 +66,7 @@ class BenchmarkWriter:
         self._path = Path(output_path)
         self._file = None
 
-    def __enter__(self) -> "BenchmarkWriter":
+    def __enter__(self) -> BenchmarkWriter:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._file = self._path.open("w", encoding="utf-8")
         return self

@@ -5,8 +5,8 @@ import shutil
 from pathlib import Path
 
 from src.indexing.faiss_store import FAISSStore
-from src.utils.logger import get_logger
 from src.indexing.metadata import CheckpointMetadata
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -67,7 +67,6 @@ class CheckpointManager:
 
         with open(
             self.metadata_file,
-            "r",
             encoding="utf-8",
         ) as f:
 

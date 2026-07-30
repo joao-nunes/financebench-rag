@@ -1,13 +1,14 @@
-from pathlib import Path
-import json
-from dataclasses import asdict
-from src.evaluation.models import BenchmarkResult
 import csv
+import json
 import platform
 import subprocess
 import sys
+from dataclasses import asdict
 from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
+
+from src.evaluation.models import BenchmarkResult
 
 
 def _package_version(package_name: str) -> str | None:

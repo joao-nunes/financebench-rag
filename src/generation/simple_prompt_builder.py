@@ -1,6 +1,6 @@
+from src.generation.prompt_builder import PromptBuilder
 from src.generation.templates import RAG_PROMPT
 from src.retrieval.models import RetrievalResult
-from src.generation.prompt_builder import PromptBuilder
 
 
 class SimplePromptBuilder(PromptBuilder):

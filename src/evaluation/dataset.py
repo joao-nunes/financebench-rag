@@ -1,11 +1,11 @@
 import json
+import re
+from abc import ABC, abstractmethod
 from pathlib import Path
 
-from .models import EvaluationSample
-from abc import ABC, abstractmethod
 import pandas as pd
 
-from abc import ABC, abstractmethod
+from .models import EvaluationSample
 
 
 class EvaluationDataset(ABC):
@@ -15,10 +15,6 @@ class EvaluationDataset(ABC):
 
     @abstractmethod
     def __len__(self): ...
-
-
-import re
-from pathlib import Path
 
 YEAR_PATTERN = re.compile(r"(20\d{2})")
 FILING_PATTERN = re.compile(r"(10K|10Q|EARNINGS)$")

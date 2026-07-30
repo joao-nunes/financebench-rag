@@ -1,13 +1,10 @@
+import logging
+
 from fastapi import APIRouter, Depends
 
 from api.dependencies import get_rag_service
-from api.schemas import ChatRequest, ChatResponse
+from api.schemas import ChatRequest, ChatResponse, Source
 from src.pipeline.service import RAGService
-
-
-from api.schemas import Source
-
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from src.config import EMBEDDING_MODEL, EMBEDDING_BATCH_SIZE, EMBEDDING_DEVICE
+from src.config import EMBEDDING_BATCH_SIZE, EMBEDDING_DEVICE, EMBEDDING_MODEL
 
 
 def get_embedding_model() -> HuggingFaceEmbeddings:

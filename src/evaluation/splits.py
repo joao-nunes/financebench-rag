@@ -15,7 +15,7 @@ class Split:
     metadata: dict
 
     @classmethod
-    def load(cls, directory: str | Path) -> "Split":
+    def load(cls, directory: str | Path) -> Split:
         """
         Load a split from disk.
         """

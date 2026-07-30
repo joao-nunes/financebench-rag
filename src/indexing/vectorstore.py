@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from src.indexing.faiss_store import FAISSStore
 
