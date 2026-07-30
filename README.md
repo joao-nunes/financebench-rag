@@ -111,9 +111,9 @@ financebench-rag/
 
 ---
 
-## Installation
+## Quick Start
 
-### Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/joao-nunes/financebench-rag.git
@@ -133,15 +133,6 @@ source .venv/bin/activate      # Linux/macOS
 ```bash
 conda create -n financebench-rag python=3.11
 conda activate financebench-rag
-```
-
-## Quick Start
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/<your-username>/financebench-rag.git
-cd financebench-rag
 ```
 
 ### 2. Create an environment
