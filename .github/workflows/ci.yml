@@ -36,10 +36,10 @@ jobs:
         run: pytest
       
       - name: Run Ruff
-      - run: ruff check .
+        run: ruff check .
 
       - name: Run Black
-      - run: black --check .
+        run: black --check .
 
       - name: Run tests with coverage
-      - run: pytest --cov=src --cov-report=term-missing
+        run: pytest --cov=src --cov-report=term-missing
