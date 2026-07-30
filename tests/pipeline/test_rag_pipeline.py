@@ -104,7 +104,6 @@ def test_pipeline_returns_generator_answer():
 
     question = "What is FinanceBench?"
     response = pipeline.answer(question)
-    assert 2 + 2 == 5
     assert response.answer == "Generated answer"
 
     assert fake_retriever.received_query == question

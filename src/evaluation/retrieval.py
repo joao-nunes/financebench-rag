@@ -5,7 +5,7 @@ from dataclasses import dataclass, asdict
 from src.evaluation.models import BaseEvaluator, EvaluationResult, EvaluationSample
 
 from .metrics import (
-    unbounded_recall,
+    hit_rate,
     ndcg_at_k,
     precision_at_k,
     recall_at_k,
@@ -15,7 +15,7 @@ from .metrics import (
 
 @dataclass(slots=True)
 class RetrievalMetrics:
-    unbounded_recall: float
+    hit_rate: float
     recall_at_1: float
     recall_at_5: float
     recall_at_10: float
@@ -40,7 +40,7 @@ class RetrievalEvaluator(BaseEvaluator):
         retrieved = self._aggregate_chunks(result.retrieved_chunks)
         reranked = self._aggregate_chunks(result.reranked_chunks)
         return RetrievalMetrics(
-            unbounded_recall=unbounded_recall(
+            hit_rate=hit_rate(
                 relevant,
                 retrieved,
             ),

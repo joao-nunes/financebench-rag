@@ -28,10 +28,23 @@ class GenerationMetric(ABC):
     ) -> float: ...
 
 
-def unbounded_recall(relevant: set[str], retrieved: list[str]) -> float:
+def hit_rate(
+    relevant: set[str],
+    retrieved: list[str],
+    k: int | None = None,
+) -> float:
     """
-    Returns 1 if at least one relevant document was retrieved.
+    Hit Rate (Hit@k).
+
+    Returns 1.0 if at least one relevant document is retrieved,
+    otherwise returns 0.0.
+
+    If k is provided, only the top-k retrieved documents are considered.
     """
+
+    if k is not None:
+        retrieved = retrieved[:k]
+
     return float(any(doc in relevant for doc in retrieved))
 
 
