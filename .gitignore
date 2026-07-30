@@ -70,7 +70,7 @@ data/*
 # ==========================
 # Vector stores
 # ==========================
-data/vectorstore/
+data/vectorstore/full/
 
 # ==========================
 # Models / Cache
