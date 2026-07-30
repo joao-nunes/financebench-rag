@@ -5,9 +5,7 @@ from pathlib import Path
 import requests
 from tqdm import tqdm
 
-BASE_URL = (
-    "https://raw.githubusercontent.com/patronus-ai/financebench/main"
-)
+BASE_URL = "https://raw.githubusercontent.com/patronus-ai/financebench/main"
 
 DATA_FILES = [
     "financebench_open_source.jsonl",
