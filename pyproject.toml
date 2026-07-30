@@ -10,19 +10,40 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "pydantic",
-    "pandas",
-    "numpy",
-    "torch",
-    "sentence-transformers",
-    "langchain",
-    "langchain-community",
-    "langchain-openai",
-    "faiss-cpu",
-    "python-dotenv",
-    "openai",
+    # API
+    "fastapi>=0.140",
+    "uvicorn[standard]>=0.51",
+
+    # LLM / RAG
+    "langchain>=1.3",
+    "langchain-core>=1.5",
+    "langchain-community>=0.4",
+    "langchain-openai>=1.3",
+    "langchain-text-splitters>=1.1",
+    "langchain-huggingface",
+
+    # Embeddings & Retrieval
+    "sentence-transformers>=5.6",
+    "faiss-cpu>=1.11",
+    "torch>=2.7",
+    "transformers>=4.56",
+
+    # OpenAI
+    "openai>=2.46",
+    "tiktoken>=0.13",
+
+    # Data processing
+    "numpy>=2.3",
+    "pandas>=3.0",
+    "scikit-learn>=1.7",
+    "pypdf>=6.1",
+
+    # Configuration
+    "python-dotenv>=1.2",
+
+    # Validation
+    "pydantic>=2.13",
+    "pydantic-settings>=2.14",
 ]
 
 [tool.setuptools.packages.find]
@@ -38,10 +59,14 @@ select = ["E", "F", "I", "UP", "B"]
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "ruff",
-    "black",
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
+    "ruff>=0.12",
+    "black>=25.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--cov=src --cov-report=term-missing"
+
+

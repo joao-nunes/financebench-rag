@@ -1,9 +1,12 @@
 # FinanceBench RAG
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-REST_API-009688)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
-![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://github.com/<username>/financebench-rag/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)
+![Ruff](https://img.shields.io/badge/linter-ruff-D7FF64)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 A production-oriented Retrieval-Augmented Generation (RAG) system for answering questions over SEC financial filings from the FinanceBench dataset.
 
@@ -110,63 +113,63 @@ financebench-rag/
 
 ## Installation
 
-Clone the repository
+### Clone the repository
 
 ```bash
-git clone https://github.com/joao-nunes/financebench-rag.git
+git clone https://github.com/<your-username>/financebench-rag.git
 cd financebench-rag
 ```
 
-### Option 1: Conda
-
-```bash
-conda create -n financebench-rag python 3.11.15
-conda activate financebench-rag
-pip install -r requirements.txt
-```
-
-### Option 2: Python virtual environment
+### Option 1: Create a virtual environment (recommended)
 
 ```bash
 python -m venv .venv
-
-# Linux / macOS
-source .venv/bin/activate
-
-# Windows
-.venv\Scripts\activate
-
-pip install -r requirements.txt
+source .venv/bin/activate      # Linux/macOS
+# .venv\Scripts\activate       # Windows
 ```
 
-Create a `.env` file
-```bash
-cp .env.example .env
-```
-
-And edit
-
-```text
-OPENAI_API_KEY=<your-api-key>
-```
-
----
-
-## Running the Application
-
-Start the FastAPI server
+### Option 2: Create a Conda environment (optional)
 
 ```bash
-uvicorn api.app:app --reload
+conda create -n financebench-rag python=3.11
+conda activate financebench-rag
 ```
 
-The interactive API documentation is available at
+### Install the project
+
+Project dependencies are managed through **`pyproject.toml`**.
+
+Install the project and its runtime dependencies:
+
+```bash
+pip install .
+```
+
+For development (tests, linting, formatting, coverage, etc.):
+
+```bash
+pip install ".[dev]"
+```
+
+### Configure environment variables
+
+Create a `.env` file (or copy `.env.example`):
 
 ```text
-http://127.0.0.1:8000/docs
+OPENAI_API_KEY=your_openai_api_key
+EMBEDDING_DEVICE=cpu
 ```
 
----
+### Run the API
+
+```bash
+uvicorn api.main:app --reload
+```
+
+The API will be available at:
+
+- http://localhost:8000
+- http://localhost:8000/docs
 
 ## Example Request
 
