@@ -150,21 +150,6 @@ git clone https://github.com/joao-nunes/financebench-rag.git
 cd financebench-rag
 ```
 
-### Option 1: Create a virtual environment (recommended)
-
-```bash
-python -m venv .venv
-source .venv/bin/activate      # Linux/macOS
-# .venv\Scripts\activate       # Windows
-```
-
-### Option 2: Create a Conda environment (optional)
-
-```bash
-conda create -n financebench-rag python=3.11
-conda activate financebench-rag
-```
-
 ### 2. Create an environment
 
 **Virtual environment (recommended)**
@@ -199,6 +184,7 @@ Copy `.env.example` to `.env` and set your OpenAI API key.
 
 ```text
 OPENAI_API_KEY=your_openai_api_key
+EMBEDDING_DEVICE=cpu
 ```
 
 ### 5. Download the FinanceBench dataset
