@@ -9,8 +9,9 @@ description = "A modular Retrieval-Augmented Generation system for FinanceBench.
 readme = "README.md"
 requires-python = ">=3.11"
 
-[tool.setuptools]
-packages = ["src"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "api*"]
 
 [tool.ruff]
 line-length = 88
