@@ -16,6 +16,7 @@ class EvaluationDataset(ABC):
     @abstractmethod
     def __len__(self): ...
 
+
 YEAR_PATTERN = re.compile(r"(20\d{2})")
 FILING_PATTERN = re.compile(r"(10K|10Q|EARNINGS)$")
 

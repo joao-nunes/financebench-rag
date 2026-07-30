@@ -78,8 +78,8 @@ class RAGPipeline:
             logger.info("Pipeline completed successfully")
 
             logger.info(
-                "Pipeline metrics | total=%.3fs | retrieval=%.3fs | " \
-                "reranking=%.3fs | prompt=%.3fs | generation=%.3fs | retrieved=%d | " \
+                "Pipeline metrics | total=%.3fs | retrieval=%.3fs | "
+                "reranking=%.3fs | prompt=%.3fs | generation=%.3fs | retrieved=%d | "
                 "reranked=%d | prompt_length=%d",
                 metrics.pipeline_time,
                 metrics.retrieval_time,

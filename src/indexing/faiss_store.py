@@ -62,8 +62,8 @@ class FAISSStore:
             raise RuntimeError("Index has not been initialized.")
 
         text_embeddings = [
-            (doc.page_content, emb) for doc, emb in 
-            zip(documents, embeddings, strict=True)
+            (doc.page_content, emb)
+            for doc, emb in zip(documents, embeddings, strict=True)
         ]
 
         embeddings = np.asarray(embeddings, dtype=np.float32)
