@@ -13,7 +13,7 @@ FINANCEBENCH_DIR = DATA_DIR / "financebench"
 
 PDF_DIR = FINANCEBENCH_DIR / "pdfs"
 
-VECTORSTORE_DIR = DATA_DIR / "full/vectorstore"
+VECTORSTORE_DIR = DATA_DIR / "vectorstore/sample"
 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 EMBEDDING_BATCH_SIZE = 64
