@@ -9,6 +9,22 @@ description = "A modular Retrieval-Augmented Generation system for FinanceBench.
 readme = "README.md"
 requires-python = ">=3.11"
 
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "pandas",
+    "numpy",
+    "torch",
+    "sentence-transformers",
+    "langchain",
+    "langchain-community",
+    "langchain-openai",
+    "faiss-cpu",
+    "python-dotenv",
+    "openai",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["src*", "api*"]
