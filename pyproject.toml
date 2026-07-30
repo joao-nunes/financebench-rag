@@ -26,3 +26,6 @@ dev = [
     "ruff",
     "black",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
