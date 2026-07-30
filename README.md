@@ -42,8 +42,8 @@ The application is organized into independent components, each with a single res
                       RAGService
                            │
                            ▼
-                     RAGPipeline
-       ┌─────────────┼─────────────┬─────────────┐
+                       RAGPipeline
+       ┌─────────────┬─────────────┬─────────────┐
        ▼             ▼             ▼             ▼
  Retriever      Reranker    PromptBuilder   Generator
        │                                        │
