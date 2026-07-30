@@ -3,8 +3,6 @@ from pathlib import Path
 import pandas as pd
 
 from src.evaluation.writer import ExperimentWriter
-from src.chains.llm import get_llm
-from src.chains.prompts import get_rag_prompt
 from src.evaluation.benchmark import BenchmarkRunner
 from src.evaluation.dataset import FinanceBenchDataset
 from src.evaluation.pipeline import RetrievalPipeline
@@ -13,8 +11,6 @@ from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
 from retrieval.faiss_retriever import create_retriever
 from src.evaluation.splits import Split
-from scripts.error_analysis import save_error_analysis
-from src.evaluation.benchmark import BenchmarkWriter
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 
 
@@ -26,12 +22,7 @@ SEED = 42
 
 experiment_dir = Path("experiments/baseline")
 
-from dataclasses import asdict
-import json
 from pathlib import Path
-
-from src.evaluation.models import BenchmarkResult
-
 
 VECTORSTORE_PATH = Path("./data/vectorstore")
 
