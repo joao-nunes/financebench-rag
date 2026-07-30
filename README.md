@@ -288,7 +288,6 @@ The retrieval pipeline is intentionally decoupled from the API layer. Internal d
 
 ## Current Roadmap
 
-* GitHub Actions CI/CD
 * Comprehensive unit and integration testing
 * Structured logging
 * Pipeline latency and retrieval metrics
