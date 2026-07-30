@@ -11,7 +11,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
     """
     Create and return the embedding model.
     """
-
+    print(f"EMBEDDING_DEVICE = {EMBEDDING_DEVICE!r}")
     return HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL,
         model_kwargs={"device": EMBEDDING_DEVICE},

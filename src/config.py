@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+import os
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,7 +16,8 @@ VECTORSTORE_DIR = DATA_DIR / "vectorstore"
 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 EMBEDDING_BATCH_SIZE = 64
-EMBEDDING_DEVICE = "mps"
+
+EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "auto")
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
