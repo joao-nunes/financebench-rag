@@ -116,7 +116,7 @@ financebench-rag/
 ### Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/financebench-rag.git
+git clone https://github.com/joao-nunes/financebench-rag.git
 cd financebench-rag
 ```
 
@@ -199,7 +199,7 @@ This generates the FAISS vector index used for semantic retrieval.
 ### 7. Launch the API
 
 ```bash
-uvicorn api.main:app --reload
+uvicorn api.app:app --reload
 ```
 
 Visit:
