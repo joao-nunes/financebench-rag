@@ -113,6 +113,36 @@ financebench-rag/
 
 ## Quick Start
 
+Clone the repository:
+
+```bash
+git clone https://github.com/joao-nunes/financebench-rag.git
+cd financebench-rag
+```
+
+Create a `.env` file:
+
+```env
+OPENAI_API_KEY=your_api_key
+EMBEDDING_DEVICE=cpu
+```
+
+Run with Docker:
+
+```bash
+docker compose up --build
+```
+
+The repository includes a pre-built sample vector store, so no additional setup is required.
+
+The API will be available at:
+
+```
+http://localhost:8000/docs
+```
+
+## Installation
+
 ### 1. Clone the repository
 
 ```bash
@@ -182,7 +212,9 @@ This downloads the FinanceBench documents and stores them in the `data/` directo
 ### 6. Build the vector store
 
 ```bash
-python scripts/build_vectorstore.py
+python scripts/build_vectorstore.py \
+    --input data/financebench \
+    --output data/vectorstore/full
 ```
 
 This generates the FAISS vector index used for semantic retrieval.
@@ -246,40 +278,6 @@ Example Response
   ]
 }
 ```
-
-## Running with Docker
-
-Create a `.env` file in the project root:
-
-```text
-OPENAI_API_KEY=<your-api-key>
-EMBEDDING_DEVICE=cpu
-```
-
-Build and start the application:
-
-```bash
-docker compose up --build
-```
-
-The API will be available at:
-
-```text
-http://localhost:8000
-```
-
-Interactive documentation:
-
-```text
-http://localhost:8000/docs
-```
-
-Stop the application with:
-
-```bash
-docker compose down
-```
-
 
 ---
 
