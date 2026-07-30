@@ -1,5 +1,10 @@
 # FinanceBench RAG
 
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST_API-009688)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 A production-oriented Retrieval-Augmented Generation (RAG) system for answering questions over SEC financial filings from the FinanceBench dataset.
 
 The project was built to explore the software engineering principles behind modern LLM applications, with a focus on modularity, maintainability, and extensibility. Rather than being a simple prototype, it follows a layered architecture that cleanly separates retrieval, reranking, prompt construction, generation, and API serving.
@@ -8,14 +13,18 @@ The project was built to explore the software engineering principles behind mode
 
 ## Features
 
-* Dense semantic retrieval using FAISS
+* Retrieval-Augmented Generation (RAG) over SEC financial filings from the FinanceBench dataset
+* Dense semantic retrieval using FAISS vector search
 * Cross-encoder reranking for improved retrieval quality
-* Retrieval-Augmented Generation (RAG) with OpenAI models
-* Modular pipeline architecture
+* Retrieval-Augmented Generation using OpenAI models
+* Modular, layered architecture with clearly separated components
 * FastAPI REST API
-* Dependency injection and lifecycle management
-* Clear separation between the core RAG pipeline and the REST API layer
-* Easily extensible abstractions for retrieval, reranking, prompt building, and generation
+* Dependency injection and application lifecycle management
+* Docker and Docker Compose support for reproducible deployment
+* Environment-based configuration using `.env`
+* Easily extensible abstractions for retrieval, reranking, prompt construction, and generation
+* Designed with software engineering best practices for maintainability and extensibility
+
 
 ---
 
@@ -58,7 +67,12 @@ The application is organized into independent components, each with a single res
 
 ---
 
+### Deployment
+
+The application is containerized using Docker and orchestrated with Docker Compose. Configuration is managed through environment variables, allowing the same image to be used across local development and production environments. This ensures reproducible builds, isolated dependencies, and straightforward deployment.
+
 ## Project Structure
+
 
 ```text
 financebench-rag/
@@ -83,6 +97,12 @@ financebench-rag/
 ├── data/
 ├── tests/
 ├── docs/
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── .env.example
+├── pyproject.toml
+├── requirements.txt
 └── README.md
 ```
 
@@ -120,6 +140,11 @@ pip install -r requirements.txt
 ```
 
 Create a `.env` file
+```bash
+cp .env.example .env
+```
+
+And edit
 
 ```text
 OPENAI_API_KEY=<your-api-key>
@@ -192,6 +217,40 @@ Example Response
 }
 ```
 
+## Running with Docker
+
+Create a `.env` file in the project root:
+
+```text
+OPENAI_API_KEY=<your-api-key>
+EMBEDDING_DEVICE=cpu
+```
+
+Build and start the application:
+
+```bash
+docker compose up --build
+```
+
+The API will be available at:
+
+```text
+http://localhost:8000
+```
+
+Interactive documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+Stop the application with:
+
+```bash
+docker compose down
+```
+
+
 ---
 
 ## Design Principles
@@ -211,30 +270,30 @@ The retrieval pipeline is intentionally decoupled from the API layer. Internal d
 
 ## Current Roadmap
 
-The next development milestones include:
-
+* GitHub Actions CI/CD
+* Comprehensive unit and integration testing
 * Structured logging
-* Pipeline latency metrics
-* Comprehensive testing
-* Docker support
-* CI/CD
-* Advanced retrieval techniques
-* Hybrid search
-* Query rewriting
-* Retrieval evaluation
+* Pipeline latency and retrieval metrics
+* Health checks and observability
+* Hybrid retrieval (BM25 + dense retrieval)
+* Query rewriting and expansion
+* Advanced retrieval evaluation
 
 ---
 
 ## Technologies
 
-* Python
-* FastAPI
-* PyTorch
-* LangChain
-* FAISS
-* Hugging Face Transformers
-* OpenAI API
-* Pydantic
+- Python
+- FastAPI
+- PyTorch
+- Sentence Transformers
+- LangChain
+- FAISS
+- Hugging Face Transformers
+- OpenAI API
+- Docker
+- Docker Compose
+- Pydantic
 
 ---
 
