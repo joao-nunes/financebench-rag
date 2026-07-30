@@ -5,7 +5,7 @@ from src.indexing.faiss_store import FAISSStore
 from src.pipeline.rag_pipeline import RAGPipeline
 from src.pipeline.service import RAGService
 from src.retrieval.faiss_retriever import FAISSRetriever
-from src.retrieval.reranking import CrossEncoderReranker
+from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 from src.generation.prompt_builder import SimplePromptBuilder
 from src.generation.openai_generator import OpenAIGenerator
 

@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends
-from fastapi import HTTPException
 
 from api.dependencies import get_rag_service
 from api.schemas import ChatRequest, ChatResponse
 from src.pipeline.service import RAGService
-from src.exceptions import RetrievalError
+
 
 from api.schemas import Source
 

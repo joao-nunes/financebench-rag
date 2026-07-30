@@ -15,7 +15,7 @@ from retrieval.faiss_retriever import create_retriever
 from src.evaluation.splits import Split
 from scripts.error_analysis import save_error_analysis
 from src.evaluation.benchmark import BenchmarkWriter
-from src.retrieval.reranking import CrossEncoderReranker
+from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 
 
 EXPERIMENT_NAME = "baseline"

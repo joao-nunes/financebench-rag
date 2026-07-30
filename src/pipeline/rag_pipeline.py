@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.retrieval.retriever import Retriever
-from src.retrieval.reranking import CrossEncoderReranker
+from src.retrieval.reranker import Reranker
 from src.generation.generator import Generator
 from src.generation.prompt_builder import PromptBuilder
 from src.retrieval.models import RetrievalResult
@@ -23,7 +23,7 @@ class RAGPipeline:
     def __init__(
         self,
         retriever: Retriever,
-        reranker: CrossEncoderReranker,
+        reranker: Reranker,
         prompt_builder: PromptBuilder,
         generator: Generator,
     ) -> None:
@@ -72,8 +72,6 @@ class RAGPipeline:
             answer = self.generator.generate(prompt)
 
             metrics.generation_time = time.perf_counter() - start
-
-            
 
             metrics.pipeline_time = time.perf_counter() - pipeline_start
 

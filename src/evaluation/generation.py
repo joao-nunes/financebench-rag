@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
 from src.evaluation.metrics import AggregatedGenerationMetrics
-from src.evaluation.models import BaseEvaluator, EvaluationResult, EvaluationSample
+from src.evaluation.models import EvaluationResult, EvaluationSample
 from langchain_core.language_models.chat_models import BaseChatModel
 
 

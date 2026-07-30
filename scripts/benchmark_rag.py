@@ -13,8 +13,8 @@ from src.evaluation.splits import Split
 from src.evaluation.writer import ExperimentWriter
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
-from src.retrieval.reranking import CrossEncoderReranker
-from retrieval.faiss_retriever import create_retriever
+from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
+from src.retrieval.faiss_retriever import create_retriever
 
 EXPERIMENT_NAME = "baseline_rag"
 

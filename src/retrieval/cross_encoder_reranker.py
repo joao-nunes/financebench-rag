@@ -1,38 +1,15 @@
-from __future__ import annotations
-
-from abc import ABC, abstractmethod
-
+from src.exceptions import RerankingError
+from src.retrieval.reranker import Reranker  
 from src.retrieval.models import RetrievalResult
 from sentence_transformers import CrossEncoder
-from src.logging_config import logging
-from src.exceptions import RerankingError
 
+
+from src.logging_config import logging
 
 logger = logging.getLogger(__name__)
 
-class BaseReranker(ABC):
-    """Base interface for document rerankers."""
 
-    @abstractmethod
-    def rerank(
-        self,
-        query: str,
-        documents: list[RetrievalResult],
-    ) -> list[RetrievalResult]:
-        ...
-
-
-class NoOpReranker(BaseReranker):
-
-    def rerank(
-        self,
-        query: str,
-        chunks: list[RetrievalResult],
-    ) -> list[RetrievalResult]:
-        return chunks
-    
-
-class CrossEncoderReranker(BaseReranker):
+class CrossEncoderReranker(Reranker):
 
     def __init__(
         self,

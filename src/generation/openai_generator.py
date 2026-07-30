@@ -29,6 +29,7 @@ class OpenAIGenerator(Generator):
                 model=self.model,
                 input=prompt,
             )
+            return response.output_text
         except Exception as e:
             raise GenerationError("Failed to generate response.") from e
-        return response.output_text
+        
