@@ -9,7 +9,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = ROOT_DIR / "data"
 
-FINANCEBENCH_DIR = DATA_DIR / "financebench"
+FINANCEBENCH_DIR = DATA_DIR / "sample"
 
 PDF_DIR = FINANCEBENCH_DIR / "pdfs"
 
