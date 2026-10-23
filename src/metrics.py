@@ -11,5 +11,6 @@ class PipelineMetrics:
 
     retrieved_documents: int = 0
     reranked_documents: int = 0
+    context_documents: int = 0
 
     prompt_length: int = 0

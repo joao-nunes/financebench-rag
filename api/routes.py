@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 
 from api.dependencies import get_rag_service
 from api.schemas import ChatRequest, ChatResponse, Source
+from src.config import MAX_SOURCES
 from src.pipeline.service import RAGService
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,6 @@ def chat(
                 score=doc.score,
                 content=doc.content,
             )
-            for doc in response.retrieved_documents
+            for doc in response.retrieved_documents[:MAX_SOURCES]
         ],
     )

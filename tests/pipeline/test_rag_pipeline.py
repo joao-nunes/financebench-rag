@@ -10,7 +10,6 @@ from src.retrieval.retriever import Retriever
 
 
 class FakeRetriever(Retriever):
-
     def __init__(self):
         self.received_query = None
 
@@ -33,13 +32,11 @@ class FakeRetriever(Retriever):
 
 
 class FailingRetriever(Retriever):
-
     def retrieve(self, query: str) -> list[RetrievalResult]:
         raise RetrievalError("Failed to retrieve relevant chunks.")
 
 
 class FakeReranker(Reranker):
-
     def __init__(self):
         self.received_query = None
         self.received_chunks = None
@@ -55,7 +52,6 @@ class FakeReranker(Reranker):
 
 
 class FailingReranker(Reranker):
-
     def rerank(
         self, query: str, chunks: list[RetrievalResult]
     ) -> list[RetrievalResult]:
@@ -63,7 +59,6 @@ class FailingReranker(Reranker):
 
 
 class FakePromptBuilder(PromptBuilder):
-
     def __init__(self):
         self.received_question = None
         self.received_context = None
@@ -75,13 +70,11 @@ class FakePromptBuilder(PromptBuilder):
 
 
 class FailingPromptBuilder(PromptBuilder):
-
     def build(self, question, context):
         raise PromptBuildError("Failed to build prompt.")
 
 
 class FakeGenerator(Generator):
-
     def __init__(self):
         self.received_prompt = None
 
@@ -170,3 +163,26 @@ def test_pipeline_raises_prompt_build_error():
 
     with pytest.raises(PromptBuildError):
         pipeline.answer("What is FinanceBench?")
+
+
+class FakeSelector:
+    def select(self, chunks):
+        return chunks[:1]
+
+
+def test_pipeline_passes_only_selected_chunks_to_prompt():
+    prompt_builder = FakePromptBuilder()
+
+    pipeline = RAGPipeline(
+        retriever=FakeRetriever(),
+        reranker=FakeReranker(),
+        prompt_builder=prompt_builder,
+        generator=FakeGenerator(),
+        context_selector=FakeSelector(),
+    )
+
+    response = pipeline.answer("What is FinanceBench?")
+
+    assert [c.document_id for c in prompt_builder.received_context] == ["doc_1"]
+    assert [c.document_id for c in response.retrieved_documents] == ["doc_1"]
+    assert response.metrics.context_documents == 1

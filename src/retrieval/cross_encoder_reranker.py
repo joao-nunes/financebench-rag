@@ -13,7 +13,7 @@ class CrossEncoderReranker(Reranker):
     def __init__(
         self,
         model_name: str = "BAAI/bge-reranker-base",
-        top_n: int = 5,
+        top_n: int | None = 5,
         device: str | None = None,
     ):
         self._model = CrossEncoder(

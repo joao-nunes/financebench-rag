@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from src.generation.generator import Generator
 from src.generation.prompt_builder import PromptBuilder
 from src.metrics import PipelineMetrics
+from src.retrieval.context_selector import TokenBudgetSelector
 from src.retrieval.models import RetrievalResult
 from src.retrieval.reranker import Reranker
 from src.retrieval.retriever import Retriever
@@ -20,19 +21,20 @@ class PipelineResponse:
 
 
 class RAGPipeline:
-
     def __init__(
         self,
         retriever: Retriever,
         reranker: Reranker,
         prompt_builder: PromptBuilder,
         generator: Generator,
+        context_selector: TokenBudgetSelector | None = None,
     ) -> None:
 
         self.retriever = retriever
         self.reranker = reranker
         self.prompt_builder = prompt_builder
         self.generator = generator
+        self.context_selector = context_selector
 
     def answer(self, question: str) -> PipelineResponse:
         """
@@ -57,6 +59,10 @@ class RAGPipeline:
             metrics.reranking_time = time.perf_counter() - start
             logger.info("Reranked to top %d chunks", metrics.reranked_documents)
 
+            if self.context_selector is not None:
+                reranked = self.context_selector.select(reranked)
+            metrics.context_documents = len(reranked)
+
             start = time.perf_counter()
             prompt = self.prompt_builder.build(
                 question=question,
@@ -80,7 +86,7 @@ class RAGPipeline:
             logger.info(
                 "Pipeline metrics | total=%.3fs | retrieval=%.3fs | "
                 "reranking=%.3fs | prompt=%.3fs | generation=%.3fs | retrieved=%d | "
-                "reranked=%d | prompt_length=%d",
+                "reranked=%d | context=%d | prompt_length=%d",
                 metrics.pipeline_time,
                 metrics.retrieval_time,
                 metrics.reranking_time,
@@ -88,6 +94,7 @@ class RAGPipeline:
                 metrics.generation_time,
                 metrics.retrieved_documents,
                 metrics.reranked_documents,
+                metrics.context_documents,
                 metrics.prompt_length,
             )
 

@@ -25,6 +25,14 @@ CHUNK_OVERLAP = 100
 
 TOP_K = 75
 
+# Tokens of reranked context passed to the LLM. Chosen with
+# scripts/context_budget_experiment.py: answer correctness rose from 0.29
+# (5 chunks, ~800 tokens) to 0.54 at 8000 tokens and plateaued beyond.
+CONTEXT_TOKEN_BUDGET = 8000
+
+# Sources returned by the API; the LLM still sees the full context budget.
+MAX_SOURCES = 5
+
 # =========================
 # OpenAI
 # =========================
