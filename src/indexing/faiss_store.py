@@ -32,6 +32,12 @@ class FAISSStore:
             return 0
         return self._store.index.ntotal
 
+    def document_ids(self) -> set[str]:
+        """IDs of the filings the indexed chunks come from."""
+        return {
+            doc.metadata["document_id"] for doc in self.store.docstore._dict.values()
+        }
+
     def create(
         self,
         embeddings,

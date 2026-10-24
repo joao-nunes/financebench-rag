@@ -15,6 +15,8 @@ Examples
 --------
 python scripts/context_budget_experiment.py --split dev
 python scripts/context_budget_experiment.py --split test --budgets 2000 4000
+python scripts/context_budget_experiment.py --filing-filter \\
+    --budgets 8000 --output experiments/filing_filter
 """
 
 from __future__ import annotations
@@ -46,8 +48,12 @@ from src.indexing.faiss_store import FAISSStore
 from src.retrieval.context_selector import TokenBudgetSelector
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 from src.retrieval.faiss_retriever import FAISSRetriever
+from src.retrieval.filing_filter import FilingFilter
 
 QUESTIONS_FILE = DATA_DIR / "financebench/data/financebench_open_source.jsonl"
+DOCUMENT_INFO_FILE = (
+    DATA_DIR / "financebench/data/financebench_document_information.jsonl"
+)
 SPLITS_DIR = DATA_DIR / "financebench/splits"
 
 # "top5" reproduces the current production behaviour (reranker top_n=5).
@@ -89,6 +95,11 @@ def parse_args():
     )
     parser.add_argument("--top-k", type=int, default=75)
     parser.add_argument("--reranker", default="BAAI/bge-reranker-base")
+    parser.add_argument(
+        "--filing-filter",
+        action="store_true",
+        help="Search only the filings detected from the question.",
+    )
     parser.add_argument("--judge-model", default=OPENAI_MODEL)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument(
@@ -110,7 +121,12 @@ def load_questions(split: str) -> list[dict]:
 
 
 def rank_candidates(
-    questions, vectorstore_dir: Path, top_k: int, reranker_model: str, cache: Path
+    questions,
+    vectorstore_dir: Path,
+    top_k: int,
+    reranker_model: str,
+    cache: Path,
+    filing_filter: bool = False,
 ):
     """Retrieve and rerank once per question; the result is budget-independent."""
 
@@ -125,7 +141,13 @@ def rank_candidates(
 
     store = FAISSStore()
     store.load(vectorstore_dir, get_embedding_model())
-    retriever = FAISSRetriever(store.store, top_k=top_k)
+    filter_ = None
+    if filing_filter:
+        filter_ = FilingFilter.from_document_information(
+            store.document_ids(),
+            DOCUMENT_INFO_FILE,
+        )
+    retriever = FAISSRetriever(store.store, top_k=top_k, filing_filter=filter_)
     reranker = CrossEncoderReranker(model_name=reranker_model, top_n=None)
 
     for q in tqdm(missing, desc="retrieve + rerank"):
@@ -165,6 +187,7 @@ def main():
         args.top_k,
         args.reranker,
         args.output / "ranked.pkl",
+        filing_filter=args.filing_filter,
     )
 
     records_path = args.output / "records.jsonl"

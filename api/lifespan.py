@@ -1,7 +1,12 @@
 from contextlib import asynccontextmanager
 
 import api.dependencies as dependencies
-from src.config import CONTEXT_TOKEN_BUDGET, RERANKER_MODEL, VECTORSTORE_DIR
+from src.config import (
+    CONTEXT_TOKEN_BUDGET,
+    DOCUMENT_INFO_FILE,
+    RERANKER_MODEL,
+    VECTORSTORE_DIR,
+)
 from src.generation.openai_generator import OpenAIGenerator
 from src.generation.simple_prompt_builder import SimplePromptBuilder
 from src.indexing.embeddings import get_embedding_model
@@ -12,6 +17,7 @@ from src.pipeline.service import RAGService
 from src.retrieval.context_selector import TokenBudgetSelector
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 from src.retrieval.faiss_retriever import FAISSRetriever
+from src.retrieval.filing_filter import FilingFilter
 
 
 @asynccontextmanager
@@ -28,7 +34,14 @@ async def lifespan(app):
         embedding_model,
     )
 
-    retriever = FAISSRetriever(vectorstore=vectorstore.store)
+    filing_filter = FilingFilter.from_document_information(
+        vectorstore.document_ids(),
+        DOCUMENT_INFO_FILE,
+    )
+    retriever = FAISSRetriever(
+        vectorstore=vectorstore.store,
+        filing_filter=filing_filter,
+    )
     # Keep the full ranking; the token budget decides how much reaches the LLM.
     reranker = CrossEncoderReranker(model_name=RERANKER_MODEL, top_n=None)
     context_selector = TokenBudgetSelector(CONTEXT_TOKEN_BUDGET)
