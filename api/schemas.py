@@ -6,7 +6,10 @@ class ChatRequest(BaseModel):
 
 
 class Source(BaseModel):
+    # Filing the chunk comes from, e.g. APPLE_2022_10K.
     document_id: str
+    # 1-based PDF page, as shown in a PDF viewer.
+    page: int | None
     score: float
     content: str
 

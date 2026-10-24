@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _page_number(page: int | None) -> int | None:
+    # Chunk metadata stores the 0-based page index from the PDF loader.
+    return None if page is None else page + 1
+
+
 @router.post("/chat", response_model=ChatResponse)
 def chat(
     request: ChatRequest,
@@ -24,6 +29,7 @@ def chat(
         sources=[
             Source(
                 document_id=doc.document_id,
+                page=_page_number(doc.metadata.get("page")),
                 score=doc.score,
                 content=doc.content,
             )
