@@ -13,6 +13,9 @@ FINANCEBENCH_DIR = DATA_DIR / "sample"
 
 PDF_DIR = FINANCEBENCH_DIR / "pdfs"
 
+# Company name of each filing; used to detect which filings a question is about.
+DOCUMENT_INFO_FILE = FINANCEBENCH_DIR / "data/financebench_document_information.jsonl"
+
 VECTORSTORE_DIR = DATA_DIR / "vectorstore/sample"
 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
