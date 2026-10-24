@@ -1,14 +1,13 @@
 from __future__ import annotations
 
+import logging
 import time
 from collections.abc import Iterator, Sequence
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 
-from src.utils.logger import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class EmbeddingEngine:

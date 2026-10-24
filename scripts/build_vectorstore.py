@@ -24,7 +24,7 @@ python scripts/build_vectorstore.py \
 from __future__ import annotations
 
 import argparse
-import shutil
+import pickle
 import time
 from pathlib import Path
 
@@ -35,11 +35,7 @@ from src.indexing.indexer import FAISSIndexer
 from src.ingestion.helpers import enrich_chunk
 from src.ingestion.loaders import load_pdf
 from src.ingestion.splitter import split_documents
-from src.utils.cache import (
-    cache_exists,
-    load_cache,
-    save_cache,
-)
+from src.logging_config import configure_logging
 
 
 def parse_args():
@@ -66,6 +62,29 @@ def parse_args():
     )
 
     return parser.parse_args()
+
+
+def cached(path: Path, build, rebuild: bool):
+    """Load a pickled result from path, or build and save it."""
+
+    if path.exists() and not rebuild:
+        print(f"Loading cached {path.name}...")
+        with path.open("rb") as f:
+            return pickle.load(f)
+
+    value = build()
+    with path.open("wb") as f:
+        pickle.dump(value, f)
+    return value
+
+
+def build_chunks(documents):
+    start = time.perf_counter()
+
+    chunks = [enrich_chunk(chunk) for chunk in split_documents(documents)]
+
+    print(f"Generated {len(chunks):,} chunks in {time.perf_counter() - start:.1f}s")
+    return chunks
 
 
 def load_documents(pdf_files):
@@ -97,6 +116,7 @@ def load_documents(pdf_files):
 def main():
 
     args = parse_args()
+    configure_logging(log_file="logs/indexer.log")
 
     documents_dir = args.input / "pdfs"
 
@@ -119,41 +139,8 @@ def main():
     print(f"PDFs    : {len(pdf_files)}")
     print("=" * 80)
 
-    # ------------------------------------------------------------------
-    # Documents
-    # ------------------------------------------------------------------
-
-    if cache_exists(documents_cache) and not args.rebuild:
-
-        print("Loading cached documents...")
-        documents = load_cache(documents_cache)
-
-    else:
-
-        documents = load_documents(pdf_files)
-        save_cache(documents, documents_cache)
-
-    # ------------------------------------------------------------------
-    # Chunks
-    # ------------------------------------------------------------------
-
-    if cache_exists(chunks_cache) and not args.rebuild:
-
-        print("Loading cached chunks...")
-        chunks = load_cache(chunks_cache)
-
-    else:
-
-        start = time.perf_counter()
-
-        chunks = split_documents(documents)
-        chunks = [enrich_chunk(chunk) for chunk in chunks]
-
-        elapsed = time.perf_counter() - start
-
-        print(f"Generated {len(chunks):,} chunks in {elapsed:.1f}s")
-
-        save_cache(chunks, chunks_cache)
+    documents = cached(documents_cache, lambda: load_documents(pdf_files), args.rebuild)
+    chunks = cached(chunks_cache, lambda: build_chunks(documents), args.rebuild)
 
     # ------------------------------------------------------------------
     # Embeddings
@@ -184,11 +171,7 @@ def main():
     # Save
     # ------------------------------------------------------------------
 
-    if args.output.exists():
-        shutil.rmtree(args.output)
-
-    args.output.mkdir(parents=True, exist_ok=True)
-
+    # Overwrites index.faiss / index.pkl; the cache next to them is kept.
     vector_store.save(args.output)
 
     print("\nDone!")

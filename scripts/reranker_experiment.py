@@ -22,7 +22,6 @@ import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import argparse
-import json
 import pickle
 import time
 from pathlib import Path
@@ -33,12 +32,9 @@ import torch
 from sentence_transformers import CrossEncoder
 from tqdm.auto import tqdm
 
-from src.config import CONTEXT_TOKEN_BUDGET, DATA_DIR
-from src.evaluation.splits import Split
+from src.config import CONTEXT_TOKEN_BUDGET
+from src.evaluation.financebench import load_questions
 from src.retrieval.context_selector import TokenBudgetSelector
-
-QUESTIONS_FILE = DATA_DIR / "financebench/data/financebench_open_source.jsonl"
-SPLITS_DIR = DATA_DIR / "financebench/splits"
 
 MODELS = [
     "BAAI/bge-reranker-base",
@@ -62,18 +58,6 @@ def parse_args():
     )
     parser.add_argument("--output", type=Path, default=Path("experiments/reranker"))
     return parser.parse_args()
-
-
-def load_questions(split: str) -> list[dict]:
-    questions = [json.loads(line) for line in QUESTIONS_FILE.open()]
-
-    if split == "all":
-        return questions
-
-    splits = Split.load(SPLITS_DIR)
-    ids = set(splits.development_ids if split == "dev" else splits.test_ids)
-
-    return [q for q in questions if q["financebench_id"] in ids]
 
 
 def evidence_metrics(question: dict, ranked: list, n_tokens: list[int]) -> dict:

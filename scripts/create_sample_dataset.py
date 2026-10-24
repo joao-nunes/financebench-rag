@@ -4,7 +4,7 @@ Create a lightweight FinanceBench sample dataset.
 
 The script:
 1. Selects a small set of annual reports.
-2. Copies their PDFs into data/sample/documents/.
+2. Copies their PDFs into data/sample/pdfs/.
 3. Filters the FinanceBench metadata.
 4. Filters the FinanceBench questions.
 
@@ -39,8 +39,6 @@ SAMPLE_DOCUMENTS = {
     "APPLE_2022_10K",
     "MICROSOFT_2023_10K",
     "AMAZON_2022_10K",
-    "NVIDIA_2024_10K",
-    "TESLA_2023_10K",
 }
 
 # =============================================================================
@@ -132,9 +130,6 @@ def main() -> None:
     print(f"Questions selected : {len(filtered_questions)}")
     print(f"PDFs copied        : {copied}")
     print(f"Output directory   : {DEST_DIR}")
-
-    print(SOURCE_DOCS)
-    print(SOURCE_DOCS.exists())
 
 
 if __name__ == "__main__":

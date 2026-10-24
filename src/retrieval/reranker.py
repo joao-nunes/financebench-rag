@@ -12,5 +12,6 @@ class Reranker(ABC):
     def rerank(
         self,
         query: str,
-        documents: list[RetrievalResult],
-    ) -> list[RetrievalResult]: ...
+        chunks: list[RetrievalResult],
+    ) -> list[RetrievalResult]:
+        """Return the chunks ordered by relevance, best first."""

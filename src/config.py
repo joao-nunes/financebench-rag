@@ -5,26 +5,39 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+# =========================
+# Paths
+# =========================
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
 
-FINANCEBENCH_DIR = DATA_DIR / "sample"
-
-PDF_DIR = FINANCEBENCH_DIR / "pdfs"
+# Dataset and index served by the API. The sample is committed to the
+# repository; point these at data/financebench and data/vectorstore/full
+# to serve the full benchmark.
+API_DATASET_DIR = DATA_DIR / "sample"
+VECTORSTORE_DIR = DATA_DIR / "vectorstore/sample"
 
 # Company name of each filing; used to detect which filings a question is about.
-DOCUMENT_INFO_FILE = FINANCEBENCH_DIR / "data/financebench_document_information.jsonl"
+DOCUMENT_INFO_FILE = API_DATASET_DIR / "data/financebench_document_information.jsonl"
 
-VECTORSTORE_DIR = DATA_DIR / "vectorstore/sample"
+# Full FinanceBench, used by the experiment scripts (not committed).
+FINANCEBENCH_DIR = DATA_DIR / "financebench"
+
+# =========================
+# Indexing
+# =========================
 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 EMBEDDING_BATCH_SIZE = 64
-
 EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "auto")
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
+
+# =========================
+# Retrieval
+# =========================
 
 TOP_K = 75
 
@@ -39,39 +52,10 @@ CONTEXT_TOKEN_BUDGET = 8000
 MAX_SOURCES = 5
 
 # =========================
-# OpenAI
+# Generation
 # =========================
 
-OPENAI_MODEL = "gpt-4.1"
+GENERATION_MODEL = "gpt-4.1-mini"
 
-TEMPERATURE = 0.0
-
-MAX_TOKENS = 512
-
-CACHE_DIR = DATA_DIR / "cache"
-
-DOCUMENTS_CACHE = CACHE_DIR / "documents.pkl"
-CHUNKS_CACHE = CACHE_DIR / "chunks.pkl"
-
-INDEX_BATCH_SIZE = 512
-
-CHECKPOINT_DIR = DATA_DIR / "checkpoints" / "financebench"
-
-SOURCE = ROOT_DIR / "data" / "financebench"
-DESTINATION = ROOT_DIR / "data" / "sample"
-
-QUESTIONS_FILE = SOURCE / "data/financebench_open_source.jsonl"
-DOCUMENT_INFO_FILE = SOURCE / "data/financebench_document_information.jsonl"
-SOURCE_DOCUMENTS = SOURCE / "documents"
-DESTINATION_DOCUMENTS = DESTINATION / "documents"
-
-# Companies to keep
-SAMPLE_COMPANIES = {
-    "Apple",
-    "Microsoft",
-    "Amazon",
-    "NVIDIA",
-    "Tesla",
-}
-
-# ---------------------------------------------------------------------
+# Grades answers against the FinanceBench reference in the experiments.
+JUDGE_MODEL = "gpt-4.1"

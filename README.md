@@ -123,31 +123,28 @@ The application is organized into independent components, each with a single res
                     FastAPI REST API
                            │
                            ▼
-                      RAGService
-                           │
-                           ▼
                        RAGPipeline
-       ┌─────────────┬─────────────┬─────────────┐
-       ▼             ▼             ▼             ▼
- Retriever      Reranker    PromptBuilder   Generator
-       │                                        │
-       └────────────────────────────────────────┘
-                           │
-                           ▼
-                    OpenAI Responses API
+   ┌────────────┬──────────┴───────┬───────────────┬────────────┐
+   ▼            ▼                  ▼               ▼            ▼
+Retriever    Reranker      ContextSelector   PromptBuilder  Generator
+(FAISS +     (cross-       (8k-token                        (OpenAI)
+filing       encoder)      budget)
+filter)
 ```
+
+`src/pipeline/factory.py` assembles the production pipeline; the API builds it once at startup.
 
 ### Component Responsibilities
 
 | Component         | Responsibility                                                        |
 | ----------------- | --------------------------------------------------------------------- |
-| **Retriever**     | Retrieves candidate documents from the FAISS vector store.            |
-| **Reranker**      | Improves retrieval quality using a cross-encoder.                     |
-| **PromptBuilder** | Builds the prompt from the retrieved context and the user's question. |
-| **Generator**     | Calls the LLM and generates the final answer.                         |
-| **RAGPipeline**   | Orchestrates the entire inference workflow.                           |
-| **RAGService**    | Thin service layer used by the API.                                   |
-| **FastAPI**       | Exposes the pipeline through REST endpoints.                          |
+| **Retriever**       | Dense search in FAISS, restricted to the filings the question names (company and fiscal period). |
+| **Reranker**        | Reorders the candidates with a cross-encoder.                       |
+| **ContextSelector** | Keeps the top chunks that fit the context token budget.            |
+| **PromptBuilder**   | Builds the prompt from the selected context and the question.      |
+| **Generator**       | Calls the LLM and returns the answer.                               |
+| **RAGPipeline**     | Runs the steps in order, records timings and Langfuse traces.      |
+| **FastAPI**         | Exposes the pipeline through REST endpoints.                        |
 
 ---
 
@@ -161,26 +158,23 @@ The application is containerized using Docker and orchestrated with Docker Compo
 ```text
 financebench-rag/
 │
-├── api/
-│   ├── app.py
-│   ├── dependencies.py
-│   ├── lifespan.py
-│   ├── routes.py
-│   └── schemas.py
+├── api/                  FastAPI app: routes, schemas, startup, error handlers
 │
 ├── src/
-│   ├── generation/
-│   ├── retrieval/
-│   ├── pipeline/
-│   ├── indexing/
-│   ├── ingestion/
-│   ├── evaluation/
-│   └── config.py
+│   ├── ingestion/        PDF loading and chunking
+│   ├── indexing/         Embeddings and the FAISS store
+│   ├── retrieval/        Retriever, filing filter, reranker, context selector, BM25
+│   ├── generation/       Prompt building and the OpenAI generator
+│   ├── pipeline/         RAGPipeline, its metrics and the production factory
+│   ├── evaluation/       FinanceBench questions, splits and evidence-page metrics
+│   ├── observability.py  Langfuse tracing (off without keys)
+│   ├── logging_config.py
+│   └── config.py         All settings
 │
-├── scripts/
-├── data/
+├── scripts/              Dataset download, index build, experiments
+├── experiments/          Experiment results (CSV / JSONL)
+├── data/                 Sample dataset and index (full dataset not committed)
 ├── tests/
-├── docs/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .dockerignore
@@ -192,7 +186,7 @@ financebench-rag/
 
 ---
 
-## Locall Development
+## Local Development
 
 ### 1. Clone the repository
 
@@ -267,7 +261,7 @@ To build the complete index:
 python scripts/download_financebench.py
 ```
 
-This downloads the FinanceBench documents and stores them in the `data/` directory.
+This downloads the FinanceBench questions, metadata and PDFs into `data/financebench/`.
 
 
 ```bash
@@ -311,7 +305,6 @@ The retrieval pipeline is intentionally decoupled from the API layer. Internal d
 * Structured logging
 * Pipeline latency and retrieval metrics
 * Health checks
-* Hybrid retrieval (BM25 + dense retrieval)
 * Query rewriting and expansion
 * Advanced retrieval evaluation
 

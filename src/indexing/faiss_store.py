@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -9,9 +10,7 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
-from src.utils.logger import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class FAISSStore:
@@ -74,17 +73,14 @@ class FAISSStore:
 
         embeddings = np.asarray(embeddings, dtype=np.float32)
 
-        assert embeddings.ndim == 2
-        assert embeddings.shape[1] == 768
+        if embeddings.ndim != 2 or embeddings.shape[1] != self._store.index.d:
+            raise ValueError(
+                f"Expected embeddings of shape (n, {self._store.index.d}), "
+                f"got {embeddings.shape}"
+            )
 
         if not np.isfinite(embeddings).all():
             raise ValueError("Embeddings contain NaN or Inf")
-
-        if np.isnan(embeddings).any():
-            raise ValueError("Embeddings contain NaN")
-
-        if np.isinf(embeddings).any():
-            raise ValueError("Embeddings contain Inf")
 
         logger.info(
             "Batch stats | min=%f max=%f mean=%f",

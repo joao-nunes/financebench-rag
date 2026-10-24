@@ -2,10 +2,10 @@ import logging
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import get_rag_service
+from api.dependencies import get_pipeline
 from api.schemas import ChatRequest, ChatResponse, Source
 from src.config import MAX_SOURCES
-from src.pipeline.service import RAGService
+from src.pipeline.rag_pipeline import RAGPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +15,9 @@ router = APIRouter()
 @router.post("/chat", response_model=ChatResponse)
 def chat(
     request: ChatRequest,
-    rag: RAGService = Depends(get_rag_service),
+    pipeline: RAGPipeline = Depends(get_pipeline),
 ):
-    response = rag.answer(request.question)
+    response = pipeline.answer(request.question)
 
     return ChatResponse(
         answer=response.answer,

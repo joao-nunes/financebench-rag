@@ -31,7 +31,6 @@ import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import argparse
-import json
 import pickle
 import time
 from dataclasses import asdict
@@ -46,7 +45,7 @@ from transformers import AutoTokenizer
 
 from src.config import DATA_DIR, EMBEDDING_DEVICE, EMBEDDING_MODEL
 from src.evaluation.evidence import chunk_pages, evidence_pages, score_ranking
-from src.evaluation.splits import Split
+from src.evaluation.financebench import load_questions
 from src.ingestion.helpers import enrich_chunk
 from src.ingestion.splitter import ChunkingConfig, split_documents
 
@@ -62,8 +61,6 @@ STRATEGIES = {
     "whole_page": ChunkingConfig(whole_page=True),
 }
 
-QUESTIONS_FILE = DATA_DIR / "financebench/data/financebench_open_source.jsonl"
-SPLITS_DIR = DATA_DIR / "financebench/splits"
 DOCUMENTS_CACHE = DATA_DIR / "cache/documents.pkl"
 
 RERANKER_MODEL = "BAAI/bge-reranker-base"
@@ -83,25 +80,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_questions(split: str) -> list[dict]:
-    questions = [json.loads(line) for line in QUESTIONS_FILE.open()]
-
-    if split == "all":
-        return questions
-
-    splits = Split.load(SPLITS_DIR)
-    ids = set(splits.development_ids if split == "dev" else splits.test_ids)
-
-    return [q for q in questions if q["financebench_id"] in ids]
-
-
 def load_pages(corpus: str) -> list:
     with DOCUMENTS_CACHE.open("rb") as f:
         pages = pickle.load(f)
 
     if corpus == "evidence":
-        all_questions = [json.loads(line) for line in QUESTIONS_FILE.open()]
-        keep = {q["doc_name"] for q in all_questions}
+        keep = {q["doc_name"] for q in load_questions()}
         pages = [p for p in pages if p.metadata["document_id"] in keep]
 
     return pages
