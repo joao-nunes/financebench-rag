@@ -25,6 +25,8 @@ CHUNK_OVERLAP = 100
 
 TOP_K = 75
 
+RERANKER_MODEL = "BAAI/bge-reranker-base"
+
 # Tokens of reranked context passed to the LLM. Chosen with
 # scripts/context_budget_experiment.py: answer correctness rose from 0.29
 # (5 chunks, ~800 tokens) to 0.54 at 8000 tokens and plateaued beyond.

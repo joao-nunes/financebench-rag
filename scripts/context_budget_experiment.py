@@ -88,6 +88,7 @@ def parse_args():
         "--vectorstore", type=Path, default=DATA_DIR / "vectorstore/full"
     )
     parser.add_argument("--top-k", type=int, default=75)
+    parser.add_argument("--reranker", default="BAAI/bge-reranker-base")
     parser.add_argument("--judge-model", default=OPENAI_MODEL)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument(
@@ -108,7 +109,9 @@ def load_questions(split: str) -> list[dict]:
     return [q for q in questions if q["financebench_id"] in ids]
 
 
-def rank_candidates(questions, vectorstore_dir: Path, top_k: int, cache: Path):
+def rank_candidates(
+    questions, vectorstore_dir: Path, top_k: int, reranker_model: str, cache: Path
+):
     """Retrieve and rerank once per question; the result is budget-independent."""
 
     ranked = {}
@@ -123,7 +126,7 @@ def rank_candidates(questions, vectorstore_dir: Path, top_k: int, cache: Path):
     store = FAISSStore()
     store.load(vectorstore_dir, get_embedding_model())
     retriever = FAISSRetriever(store.store, top_k=top_k)
-    reranker = CrossEncoderReranker(top_n=None)
+    reranker = CrossEncoderReranker(model_name=reranker_model, top_n=None)
 
     for q in tqdm(missing, desc="retrieve + rerank"):
         candidates = retriever.retrieve(q["question"])
@@ -157,7 +160,11 @@ def main():
 
     questions = load_questions(args.split)
     ranked = rank_candidates(
-        questions, args.vectorstore, args.top_k, args.output / "ranked.pkl"
+        questions,
+        args.vectorstore,
+        args.top_k,
+        args.reranker,
+        args.output / "ranked.pkl",
     )
 
     records_path = args.output / "records.jsonl"

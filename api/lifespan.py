@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import api.dependencies as dependencies
-from src.config import CONTEXT_TOKEN_BUDGET, VECTORSTORE_DIR
+from src.config import CONTEXT_TOKEN_BUDGET, RERANKER_MODEL, VECTORSTORE_DIR
 from src.generation.openai_generator import OpenAIGenerator
 from src.generation.simple_prompt_builder import SimplePromptBuilder
 from src.indexing.embeddings import get_embedding_model
@@ -30,7 +30,7 @@ async def lifespan(app):
 
     retriever = FAISSRetriever(vectorstore=vectorstore.store)
     # Keep the full ranking; the token budget decides how much reaches the LLM.
-    reranker = CrossEncoderReranker(top_n=None)
+    reranker = CrossEncoderReranker(model_name=RERANKER_MODEL, top_n=None)
     context_selector = TokenBudgetSelector(CONTEXT_TOKEN_BUDGET)
     prompt_builder = SimplePromptBuilder()
     generator = OpenAIGenerator()
