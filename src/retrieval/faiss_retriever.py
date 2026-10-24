@@ -55,12 +55,12 @@ class FAISSRetriever(Retriever):
             documents = self._search(query)
             return [
                 RetrievalResult(
-                    document_id=doc.metadata.get("id", str(i)),
+                    document_id=doc.metadata["document_id"],
                     content=doc.page_content,
                     score=0.0,
                     metadata=doc.metadata,
                 )
-                for i, doc in enumerate(documents)
+                for doc in documents
             ]
         except Exception as e:
             logger.debug(
