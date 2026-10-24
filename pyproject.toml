@@ -38,6 +38,9 @@ dependencies = [
     "scikit-learn>=1.7",
     "pypdf>=6.1",
 
+    # Observability
+    "langfuse>=4.17,<5",
+
     # Configuration
     "python-dotenv>=1.2",
 

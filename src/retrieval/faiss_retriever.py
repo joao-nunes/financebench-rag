@@ -8,6 +8,7 @@ from langchain_core.vectorstores import VectorStoreRetriever
 
 from src.config import TOP_K
 from src.exceptions import RetrievalError
+from src.observability import update_current
 from src.retrieval.filing_filter import FilingFilter
 from src.retrieval.models import RetrievalResult
 from src.retrieval.retriever import Retriever
@@ -100,9 +101,11 @@ class FAISSRetriever(Retriever):
         positions = [p for f in filings or () for p in self._positions.get(f, ())]
         if not positions:
             logger.info("No filing detected; searching the whole index")
+            update_current(metadata={"filings": "all"})
             return self.retriever.invoke(query)
 
         logger.info("Restricting search to filings: %s", ", ".join(filings))
+        update_current(metadata={"filings": filings})
 
         vector = np.asarray(
             [self.vectorstore.embedding_function.embed_query(query)],

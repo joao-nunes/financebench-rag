@@ -186,3 +186,35 @@ def test_pipeline_passes_only_selected_chunks_to_prompt():
     assert [c.document_id for c in prompt_builder.received_context] == ["doc_1"]
     assert [c.document_id for c in response.retrieved_documents] == ["doc_1"]
     assert response.metrics.context_documents == 1
+
+
+def test_pipeline_records_langfuse_trace(monkeypatch):
+    from langfuse import Langfuse
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+        InMemorySpanExporter,
+    )
+
+    from src import observability
+
+    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "pk-test")
+    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "sk-test")
+    exporter = InMemorySpanExporter()
+    Langfuse(span_exporter=exporter)
+    observability._client.cache_clear()
+
+    pipeline = RAGPipeline(
+        retriever=FakeRetriever(),
+        reranker=FakeReranker(),
+        prompt_builder=FakePromptBuilder(),
+        generator=FakeGenerator(),
+    )
+    response = pipeline.answer("What is FinanceBench?")
+    observability.flush()
+    observability._client.cache_clear()
+
+    spans = {s.name: s for s in exporter.get_finished_spans()}
+    root = spans["rag-pipeline"]
+
+    assert response.trace_id == format(root.context.trace_id, "032x")
+    assert spans["retrieval"].parent.span_id == root.context.span_id
+    assert spans["reranking"].parent.span_id == root.context.span_id

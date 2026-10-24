@@ -238,6 +238,25 @@ OPENAI_API_KEY=your_openai_api_key
 EMBEDDING_DEVICE=cpu
 ```
 
+### 5. Tracing with Langfuse (optional)
+
+Set Langfuse project keys in `.env` to trace every `/chat` request:
+
+```text
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_BASE_URL=https://cloud.langfuse.com
+```
+
+Each question becomes one trace, `rag-pipeline`, with child observations:
+
+* `retrieval`: the filings searched (`all` when no company is detected) and the top candidates
+* `reranking`: the top reranked chunks with their scores
+* `context-selection`: how many chunks fit the token budget
+* `generation`: the prompt, answer, model and token usage (Langfuse derives the cost)
+
+The `/chat` response includes the `trace_id`. Without the keys, tracing is off and nothing is sent.
+
 ## 6. Building the Full FinanceBench Index
 
 The repository ships with a small sample dataset for quick experimentation.
@@ -291,7 +310,7 @@ The retrieval pipeline is intentionally decoupled from the API layer. Internal d
 * Comprehensive unit and integration testing
 * Structured logging
 * Pipeline latency and retrieval metrics
-* Health checks and observability
+* Health checks
 * Hybrid retrieval (BM25 + dense retrieval)
 * Query rewriting and expansion
 * Advanced retrieval evaluation
@@ -311,6 +330,7 @@ The retrieval pipeline is intentionally decoupled from the API layer. Internal d
 - Docker
 - Docker Compose
 - Pydantic
+- Langfuse
 
 ---
 

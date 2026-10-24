@@ -14,3 +14,5 @@ class Source(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: list[Source]
+    # Langfuse trace of this answer; None when tracing is off.
+    trace_id: str | None = None
