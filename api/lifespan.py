@@ -12,6 +12,7 @@ from src.generation.simple_prompt_builder import SimplePromptBuilder
 from src.indexing.embeddings import get_embedding_model
 from src.indexing.faiss_store import FAISSStore
 from src.logging_config import configure_logging
+from src.observability import flush as flush_traces
 from src.pipeline.rag_pipeline import RAGPipeline
 from src.pipeline.service import RAGService
 from src.retrieval.context_selector import TokenBudgetSelector
@@ -61,3 +62,4 @@ async def lifespan(app):
     yield
 
     dependencies.rag_service = None
+    flush_traces()

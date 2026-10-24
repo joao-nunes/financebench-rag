@@ -29,4 +29,5 @@ def chat(
             )
             for doc in response.retrieved_documents[:MAX_SOURCES]
         ],
+        trace_id=response.trace_id,
     )
