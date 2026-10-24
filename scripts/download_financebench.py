@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""
+Download FinanceBench into data/financebench/: the question and document
+metadata into data/, and every filing PDF into pdfs/.
+
+Example
+-------
+python scripts/download_financebench.py
+"""
 
 from pathlib import Path
 
@@ -12,8 +20,9 @@ DATA_FILES = [
     "financebench_document_information.jsonl",
 ]
 
-DATA_DIR = Path("data")
-PDF_DIR = DATA_DIR / "pdfs"
+ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT / "data/financebench/data"
+PDF_DIR = ROOT / "data/financebench/pdfs"
 
 
 def download(url: str, destination: Path) -> None:
@@ -44,8 +53,8 @@ def download(url: str, destination: Path) -> None:
 
 
 def main() -> None:
-    DATA_DIR.mkdir(exist_ok=True)
-    PDF_DIR.mkdir(exist_ok=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
 
     print("Downloading metadata...")
 

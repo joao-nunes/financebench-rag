@@ -16,30 +16,6 @@ from src.retrieval.retriever import Retriever
 logger = logging.getLogger(__name__)
 
 
-def create_retriever(
-    vectorstore: FAISS,
-) -> VectorStoreRetriever:
-    """
-    Create a retriever from a vector store.
-    """
-
-    return vectorstore.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": TOP_K},
-    )
-
-
-def retrieve(
-    retriever: VectorStoreRetriever,
-    query: str,
-) -> list[Document]:
-    """
-    Retrieve relevant documents for a query.
-    """
-
-    return retriever.invoke(query)
-
-
 class FAISSRetriever(Retriever):
     """
     Dense retrieval over a FAISS store.

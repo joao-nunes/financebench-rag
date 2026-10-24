@@ -9,65 +9,18 @@ from src.exceptions import (
     RetrievalError,
 )
 
+# Status code and message returned for each pipeline failure.
+ERRORS: dict[type[RAGException], tuple[int, str]] = {
+    RetrievalError: (500, "Unable to retrieve supporting chunks."),
+    RerankingError: (500, "Unable to rerank retrieved chunks."),
+    PromptBuildError: (500, "Unable to build the prompt."),
+    GenerationError: (502, "The language model failed to generate a response."),
+}
+
 
 def register_exception_handlers(app: FastAPI) -> None:
 
-    @app.exception_handler(RetrievalError)
-    async def retrieval_error_handler(
-        request: Request,
-        exc: RetrievalError,
-    ):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": "Unable to retrieve supporting chunks.",
-            },
-        )
-
-    @app.exception_handler(RerankingError)
-    async def reranking_error_handler(
-        request: Request,
-        exc: RerankingError,
-    ):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": "Unable to rerank retrieved chunks.",
-            },
-        )
-
-    @app.exception_handler(PromptBuildError)
-    async def prompt_error_handler(
-        request: Request,
-        exc: PromptBuildError,
-    ):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": "Unable to build the prompt.",
-            },
-        )
-
-    @app.exception_handler(GenerationError)
-    async def generation_error_handler(
-        request: Request,
-        exc: GenerationError,
-    ):
-        return JSONResponse(
-            status_code=502,
-            content={
-                "detail": "The language model failed to generate a response.",
-            },
-        )
-
     @app.exception_handler(RAGException)
-    async def rag_exception_handler(
-        request: Request,
-        exc: RAGException,
-    ):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": str(exc),
-            },
-        )
+    async def rag_exception_handler(request: Request, exc: RAGException):
+        status_code, detail = ERRORS.get(type(exc), (500, str(exc)))
+        return JSONResponse(status_code=status_code, content={"detail": detail})

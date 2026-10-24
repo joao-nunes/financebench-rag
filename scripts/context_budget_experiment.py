@@ -39,8 +39,8 @@ from openai import OpenAI
 from pydantic import BaseModel
 from tqdm.auto import tqdm
 
-from src.config import DATA_DIR, OPENAI_MODEL
-from src.evaluation.splits import Split
+from src.config import DATA_DIR, JUDGE_MODEL
+from src.evaluation.financebench import DOCUMENT_INFO_FILE, load_questions
 from src.generation.openai_generator import OpenAIGenerator
 from src.generation.simple_prompt_builder import SimplePromptBuilder
 from src.indexing.embeddings import get_embedding_model
@@ -49,12 +49,6 @@ from src.retrieval.context_selector import TokenBudgetSelector
 from src.retrieval.cross_encoder_reranker import CrossEncoderReranker
 from src.retrieval.faiss_retriever import FAISSRetriever
 from src.retrieval.filing_filter import FilingFilter
-
-QUESTIONS_FILE = DATA_DIR / "financebench/data/financebench_open_source.jsonl"
-DOCUMENT_INFO_FILE = (
-    DATA_DIR / "financebench/data/financebench_document_information.jsonl"
-)
-SPLITS_DIR = DATA_DIR / "financebench/splits"
 
 # "top5" reproduces the current production behaviour (reranker top_n=5).
 DEFAULT_BUDGETS = ["top5", "1000", "2000", "4000", "8000", "16000"]
@@ -100,24 +94,12 @@ def parse_args():
         action="store_true",
         help="Search only the filings detected from the question.",
     )
-    parser.add_argument("--judge-model", default=OPENAI_MODEL)
+    parser.add_argument("--judge-model", default=JUDGE_MODEL)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument(
         "--output", type=Path, default=Path("experiments/context_budget")
     )
     return parser.parse_args()
-
-
-def load_questions(split: str) -> list[dict]:
-    questions = [json.loads(line) for line in QUESTIONS_FILE.open()]
-
-    if split == "all":
-        return questions
-
-    splits = Split.load(SPLITS_DIR)
-    ids = set(splits.development_ids if split == "dev" else splits.test_ids)
-
-    return [q for q in questions if q["financebench_id"] in ids]
 
 
 def rank_candidates(

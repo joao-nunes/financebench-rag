@@ -4,8 +4,8 @@ from dataclasses import asdict, dataclass
 
 from src.generation.generator import Generator
 from src.generation.prompt_builder import PromptBuilder
-from src.metrics import PipelineMetrics
 from src.observability import current_trace_id, observation
+from src.pipeline.metrics import PipelineMetrics
 from src.retrieval.context_selector import TokenBudgetSelector
 from src.retrieval.models import RetrievalResult
 from src.retrieval.reranker import Reranker
@@ -36,6 +36,12 @@ def _summarize(chunks: list[RetrievalResult], limit: int = 10) -> list[dict]:
 
 
 class RAGPipeline:
+    """
+    Answers a question in four steps: retrieve candidate chunks, rerank
+    them, keep those that fit the context budget, and generate an answer
+    from a prompt built on that context.
+    """
+
     def __init__(
         self,
         retriever: Retriever,
@@ -72,61 +78,45 @@ class RAGPipeline:
 
     def _answer(self, question: str) -> PipelineResponse:
         metrics = PipelineMetrics()
-        pipeline_start = time.perf_counter()
-        start = pipeline_start
+        pipeline_start = start = time.perf_counter()
 
         with observation("retrieval", as_type="retriever", input=question) as span:
             retrieved = self.retriever.retrieve(question)
             span.update(output=_summarize(retrieved))
         metrics.retrieved_documents = len(retrieved)
         metrics.retrieval_time = time.perf_counter() - start
-        logger.info("Retrieved %d candidate chunks", metrics.retrieved_documents)
 
         start = time.perf_counter()
         with observation("reranking", input={"candidates": len(retrieved)}) as span:
-            reranked = self.reranker.rerank(
-                query=question,
-                chunks=retrieved,
-            )
+            reranked = self.reranker.rerank(query=question, chunks=retrieved)
             span.update(output=_summarize(reranked))
         metrics.reranked_documents = len(reranked)
         metrics.reranking_time = time.perf_counter() - start
-        logger.info("Reranked to top %d chunks", metrics.reranked_documents)
 
+        context = reranked
         if self.context_selector is not None:
             with observation("context-selection") as span:
-                reranked = self.context_selector.select(reranked)
-                span.update(output={"chunks": len(reranked)})
-        metrics.context_documents = len(reranked)
+                context = self.context_selector.select(reranked)
+                span.update(output={"chunks": len(context)})
+        metrics.context_documents = len(context)
 
         start = time.perf_counter()
-        prompt = self.prompt_builder.build(
-            question=question,
-            context=reranked,
-        )
-
+        prompt = self.prompt_builder.build(question=question, context=context)
         metrics.prompt_length = len(prompt)
-
         metrics.prompt_build_time = time.perf_counter() - start
-        logger.info("Generating answer")
 
         start = time.perf_counter()
         answer = self.generator.generate(prompt)
-
         metrics.generation_time = time.perf_counter() - start
-
         metrics.pipeline_time = time.perf_counter() - pipeline_start
 
-        logger.info("Pipeline completed successfully")
-
         logger.info(
-            "Pipeline metrics | total=%.3fs | retrieval=%.3fs | "
-            "reranking=%.3fs | prompt=%.3fs | generation=%.3fs | retrieved=%d | "
-            "reranked=%d | context=%d | prompt_length=%d",
+            "Answered in %.2fs | retrieval=%.3fs reranking=%.3fs "
+            "generation=%.3fs | retrieved=%d reranked=%d context=%d "
+            "prompt_length=%d",
             metrics.pipeline_time,
             metrics.retrieval_time,
             metrics.reranking_time,
-            metrics.prompt_build_time,
             metrics.generation_time,
             metrics.retrieved_documents,
             metrics.reranked_documents,
@@ -136,6 +126,6 @@ class RAGPipeline:
 
         return PipelineResponse(
             answer=answer,
-            retrieved_documents=reranked,
+            retrieved_documents=context,
             metrics=metrics,
         )

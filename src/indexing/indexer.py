@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from collections.abc import Sequence
 from datetime import timedelta
@@ -8,9 +9,8 @@ from langchain_core.documents import Document
 
 from src.indexing.embedding_engine import EmbeddingEngine
 from src.indexing.faiss_store import FAISSStore
-from src.utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class FAISSIndexer:

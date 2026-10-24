@@ -1,7 +1,8 @@
+import logging
+
 from sentence_transformers import CrossEncoder
 
 from src.exceptions import RerankingError
-from src.logging_config import logging
 from src.retrieval.models import RetrievalResult
 from src.retrieval.reranker import Reranker
 
@@ -9,6 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class CrossEncoderReranker(Reranker):
+    """
+    Scores each (query, chunk) pair with a cross-encoder.
+
+    Keeps the top_n chunks, or all of them when top_n is None.
+    """
 
     def __init__(
         self,
@@ -32,41 +38,24 @@ class CrossEncoderReranker(Reranker):
         if not chunks:
             return []
         try:
-            pairs = [
-                (
-                    query,
-                    chunk.content,
-                )
-                for chunk in chunks
-            ]
-
             scores = self._model.predict(
-                pairs,
+                [(query, chunk.content) for chunk in chunks],
                 convert_to_numpy=True,
             )
-
             ranked = sorted(
                 zip(chunks, scores, strict=True),
                 key=lambda x: x[1],
                 reverse=True,
             )
-
-            reranked = []
-
-            for _, (chunk, score) in enumerate(
-                ranked[: self._top_n],
-                start=1,
-            ):
-                reranked.append(
-                    RetrievalResult(
-                        document_id=chunk.document_id,
-                        content=chunk.content,
-                        score=float(score),
-                        metadata=chunk.metadata,
-                    )
+            return [
+                RetrievalResult(
+                    document_id=chunk.document_id,
+                    content=chunk.content,
+                    score=float(score),
+                    metadata=chunk.metadata,
                 )
-
-            return reranked
+                for chunk, score in ranked[: self._top_n]
+            ]
 
         except Exception as e:
             logger.debug(

@@ -3,6 +3,7 @@ import os
 
 from openai import OpenAI
 
+from src.config import GENERATION_MODEL
 from src.exceptions import GenerationError
 from src.generation.generator import Generator
 from src.observability import observation
@@ -14,7 +15,7 @@ class OpenAIGenerator(Generator):
 
     def __init__(
         self,
-        model: str = "gpt-4.1-mini",
+        model: str = GENERATION_MODEL,
         api_key: str | None = None,
     ):
         api_key = api_key or os.environ["OPENAI_API_KEY"]

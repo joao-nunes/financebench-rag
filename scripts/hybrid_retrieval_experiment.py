@@ -34,7 +34,6 @@ import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import argparse
-import json
 import pickle
 import time
 from pathlib import Path
@@ -47,13 +46,11 @@ from sentence_transformers import CrossEncoder
 from tqdm.auto import tqdm
 
 from src.config import CONTEXT_TOKEN_BUDGET, DATA_DIR, RERANKER_MODEL
-from src.evaluation.splits import Split
+from src.evaluation.financebench import dev_ids, load_questions
 from src.indexing.embeddings import get_embedding_model
 from src.retrieval.bm25 import BM25Index, reciprocal_rank_fusion
 from src.retrieval.context_selector import TokenBudgetSelector
 
-QUESTIONS_FILE = DATA_DIR / "financebench/data/financebench_open_source.jsonl"
-SPLITS_DIR = DATA_DIR / "financebench/splits"
 BUDGETS = (2000, 4000, CONTEXT_TOKEN_BUDGET)
 
 
@@ -216,9 +213,8 @@ def main():
     args.workdir.mkdir(parents=True, exist_ok=True)
     args.output.mkdir(parents=True, exist_ok=True)
 
-    questions = [json.loads(line) for line in QUESTIONS_FILE.open()]
-    splits = Split.load(SPLITS_DIR)
-    dev_ids = set(splits.development_ids)
+    questions = load_questions()
+    dev = dev_ids()
 
     chunks = load_chunks(args.vectorstore)
     print(f"{len(questions)} questions | {len(chunks):,} chunks")
@@ -234,7 +230,7 @@ def main():
             rows.append(
                 {
                     "financebench_id": qid,
-                    "split": "dev" if qid in dev_ids else "test",
+                    "split": "dev" if qid in dev else "test",
                     "config": name,
                     **evaluate(q, candidates, chunks, scores[qid], counter),
                 }
